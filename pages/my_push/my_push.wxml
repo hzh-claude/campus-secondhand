@@ -1,0 +1,79 @@
+<!-- Tab切换 -->
+<van-tabs active="{{activeTab}}" color="#FF9500" bind:change="onTabChange">
+  <van-tab title="出售中({{onSaleList.length}})"></van-tab>
+  <van-tab title="已被预订({{lockedList.length}})"></van-tab>
+  <van-tab title="已下架({{offSaleList.length}})"></van-tab>
+</van-tabs>
+
+<!-- 出售中列表 -->
+<view class="goods-list" wx:if="{{activeTab === 0}}">
+  <view class="goods-item" wx:for="{{onSaleList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.id}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <view class="goods-desc">{{item.campus}} · 发布于{{item.publishTime}}</view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="stats">
+          <text>浏览{{item.views}}</text>
+        </view>
+      </view>
+    </view>
+    <!-- 只用 catchtap：它既绑定事件又阻止冒泡到卡片的 onGoodsTap。
+         原先同时写 bind:click 和 catchtap 是冗余的，
+         click 是 Vant 组件的事件名，普通 view 上认的是 tap。 -->
+    <view class="goods-actions">
+      <view class="action-btn sold-btn" catchtap="onMarkSoldTap" data-id="{{item.id}}">卖出</view>
+      <view class="action-btn edit-btn" catchtap="onEditTap" data-id="{{item.id}}">编辑</view>
+      <view class="action-btn offsale-btn" catchtap="onOffSaleTap" data-id="{{item.id}}">下架</view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{onSaleList.length === 0}}" description="暂无出售中的商品" />
+</view>
+
+<!-- 已被预订列表 -->
+<!-- 这一格的存在意义：告诉卖家「有买家下单了，去处理」。
+     操作按钮不放在这里，而是引到「我卖出的」——
+     那里能看到买家是谁、什么时候下的单，做决定需要这些信息。 -->
+<view class="goods-list" wx:if="{{activeTab === 1}}">
+  <view class="goods-item" wx:for="{{lockedList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.id}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <view class="goods-desc locked-hint">买家已下单，等待你确认</view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="status locked">已被预订</view>
+      </view>
+    </view>
+    <view class="goods-actions">
+      <view class="action-btn go-btn" catchtap="onGoOrdersTap">去处理</view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{lockedList.length === 0}}" description="没有等待确认的商品" />
+</view>
+
+<!-- 已下架列表 -->
+<view class="goods-list" wx:if="{{activeTab === 2}}">
+  <view class="goods-item" wx:for="{{offSaleList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.id}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <view class="goods-desc">{{item.campus}} · 下架于{{item.offSaleTime}}</view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="stats">
+          <text>浏览{{item.views}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="goods-actions">
+      <view class="action-btn resale-btn" catchtap="onReSaleTap" data-id="{{item.id}}">重新上架</view>
+      <view class="action-btn delete-btn" catchtap="onDeleteTap" data-id="{{item.id}}">删除</view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{offSaleList.length === 0}}" description="暂无已下架的商品" />
+</view>

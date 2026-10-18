@@ -1,0 +1,252 @@
+/* pages/push/push.wxss */
+page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 给固定的发布按钮让出位置，免得最后一个输入框被压在按钮下面。
+   ⚠️ 这句【原来挂在 page 上】，现在挪到了表单这一支的外层容器上。
+      挂在 page 上的话，未核验那一支（没有发布按钮、也不需要让位）
+      也会被往下顶 200rpx —— 两件事本来就没关系。
+      两边是互斥的，各管各的。 */
+.push-form {
+  padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
+}
+
+/* 图片上传区域 */
+.upload-section {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.upload-tip {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+/* 表单区域 */
+.form-section {
+  background-color: #fff;
+  padding: 30rpx 30rpx 0;
+  margin-bottom: 20rpx;
+}
+
+.form-section .section-title {
+  margin-bottom: 20rpx;
+}
+
+/* 数量输入框右边那个量词（本 / 件 / 个）。
+   它是 slot="button" 的内容，vant 会给它套一层 .van-field__button，
+   那层自带 padding-left: 8px，所以这里只调颜色和字号。 */
+.quantity-unit {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* ============================================================
+   标签列统一宽度
+   ============================================================
+   为什么需要这一条：
+     vant 的 .van-cell__title 和 .van-cell__value 都是 flex: 1，
+     也就是【标签占一半、输入框占一半】。这个默认值对英文界面合适，
+     对这里的中文标签就太宽了 —— 标签只有两三个字（售价 / 数量），
+     后面空一大截，输入框被推到屏幕正中间，整页看着很散。
+
+   为什么能在这儿覆盖它：
+     Vant 的组件设了 addGlobalClass: true（见 common/component.js），
+     所以这个页面的样式能作用到组件【内部】的节点。
+     本文件下面那句 .van-cell-group { margin: 0 -30rpx } 一直是
+     按这个前提写的，不是巧合。
+
+   ⚠️ 160rpx 是按【最长的标签】定的，现在是「商品描述」四个字
+      （约 4 × 28rpx = 112rpx），留了余量。
+      以后加更长的标签要跟着调这个数，否则标签会换行 ——
+      换行不会报错，只是那一行突然变高，很难联想到是这里。 */
+.van-cell__title {
+  flex: 0 0 auto;
+  width: 160rpx;
+}
+
+/* ============================================================
+   交易地点选择器（园区 → 楼栋）
+   ============================================================
+   这块 [自己画] 而不是 van-picker，理由写在 push.wxml 里那段注释。
+   样式上要注意的一点：弹窗里所有可点的东西都得有明显的选中态
+   （.loc-chip--on），因为这个选择器【没有滚动惯性】——
+   用户看不出「现在停在哪一档」，全靠那个橙色块。 */
+.loc-picker {
+  background-color: #fff;
+  padding: 30rpx;
+  /* 【底部为什么要让出 140rpx，而不是和上面一样的 30rpx】
+     这个弹窗贴在屏幕最底下，而 tabBar 是【盖在】页面最底层的
+     （van-tabbar 默认 50px = 100rpx，再加底部安全区），它的层级比弹窗高。
+     只留 30rpx 的话，最后一行楼栋（荷五/荷六/荷七）会被 tabBar 压掉一半 ——
+     看着像「下面还有内容但点不到」。
+     所以 30rpx 的常规边距 + 100rpx 的 tabBar 高度 + 一点余量 = 140rpx。 */
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.loc-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 30rpx;
+}
+
+.loc-picker-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.loc-picker-action {
+  font-size: 28rpx;
+  color: #999;
+  /* 撑出足够的点按面积。这几个字是弹窗唯一的出口，
+     太小了点不中，用户会以为弹窗关不掉。 */
+  padding: 10rpx 20rpx;
+}
+
+.loc-picker-ok {
+  color: #FF9500;
+  font-weight: bold;
+}
+
+.loc-picker-sub {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+}
+
+.loc-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 30rpx;
+}
+
+.loc-buildings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.loc-chip {
+  min-width: 140rpx;
+  text-align: center;
+  padding: 16rpx 24rpx;
+  border-radius: 40rpx;
+  background-color: #f5f5f5;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.loc-chip--small {
+  min-width: 100rpx;
+  padding: 14rpx 20rpx;
+  font-size: 26rpx;
+}
+
+.loc-chip--on {
+  background-color: #FF9500;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* 竹园这类没有楼栋可选的园区，用一句说明占住那一行，
+   而不是留一片空白 —— 空白看着像没加载出来。 */
+.loc-picker-empty {
+  font-size: 26rpx;
+  color: #999;
+  padding: 20rpx 0;
+}
+
+/* 发布按钮区域 */
+.submit-section {
+  position: fixed;
+  bottom: calc(100rpx + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 「取消编辑」——只在编辑态出现，放在主按钮下方。
+   故意做成一行灰字而不是第二个按钮：它是逃生出口，不是并列选项。
+   做成同等分量的按钮会让用户在「保存」和「放弃」之间犹豫，
+   而绝大多数时候他要的是保存。
+
+   这块区域是 position: fixed 的，多一行就多占一行高度，
+   所以字号和上边距都压到最小。 */
+.cancel-edit {
+  margin-top: 16rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+  padding: 8rpx;
+}
+
+/* 覆盖vant组件样式 */
+.van-cell-group {
+  margin: 0 -30rpx;
+}
+
+.van-uploader__preview-image {
+  border-radius: 8rpx;
+}
+
+.van-uploader__upload {
+  border-radius: 8rpx;
+  background-color: #f7f7f7;
+}
+/* ============================================================
+   未核验用户看到的空状态页
+   ============================================================
+   和整张表单是互斥的两个分支（见 push.wxml 顶部的 wx:if / wx:else），
+   所以这里只需要管它自己的居中。
+
+   垂直居中：可见区域 = 屏幕高度 − tabBar，不是屏幕高度。
+     van-tabbar 默认 50px（= 100rpx）再加上底部安全区，它是【盖在】
+     页面底部的，所以 100vh 居中的话内容会整体偏下半个 tabBar。
+     这一条以前写成 padding-top: 160rpx，是因为当时 van-empty 压根没
+     渲染出来（组件没在 push.json 里注册），整个空状态只剩一个按钮，
+     用手调的上边距把它顶到看起来像中间的位置。现在插画和文案回来了，
+     那个数字就不成立了 —— 换成真居中。 */
+.need-register {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 100rpx - env(safe-area-inset-bottom));
+  padding: 0 60rpx;
+}
+
+/* 不写 align-items: center。flex 子项默认 stretch = 撑满宽度，
+   正好让 van-empty 的文案按容器宽度换行；一旦居中对齐，
+   它会被压成最宽子项的宽度，那句「完成校内身份核验后才能
+   发布闲置物品」就会挤成窄窄的一条。
+   按钮自己的居中由下面这条负责。 */
+.need-register-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 40rpx;
+}
+
+/* 一句补充说明：光看见「去核验」不知道要准备什么。
+   两行内正好，太长就把空状态撑满了。 */
+.need-register-hint {
+  margin-top: 24rpx;
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+  line-height: 1.6;
+}

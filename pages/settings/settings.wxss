@@ -1,0 +1,42 @@
+/* pages/settings/settings.wxss */
+
+/* ⚠️ 这里【不能】用 .container 当页面根类名。
+   app.wxss 里有一个同名的 .container，带着 display:flex、align-items:center、
+   padding:200rpx 0 —— 页面自己的 .container 只写背景色的话，
+   那几个属性会照样漏进来，把整页挤成居中一列。
+   （delivery.wxss 踩过这个坑，那边有详细说明。） */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.group {
+  margin-top: 20rpx;
+}
+
+.group-title {
+  font-size: 26rpx;
+  color: #999;
+  padding: 20rpx 30rpx 12rpx;
+}
+
+/* 通知那一组顶部的说明。
+   颜色用提醒色而不是灰色小字：这段话是「为什么只提醒一次」的答案，
+   不读它用户就会以为小程序的通知坏了 —— 这个项目里
+   已经有太多「看起来像 bug、其实是规则」的地方了。 */
+.group-note {
+  font-size: 24rpx;
+  color: #E67700;
+  background-color: #FFF3E0;
+  line-height: 1.6;
+  padding: 16rpx 24rpx;
+  margin: 0 20rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.footnote {
+  text-align: center;
+  font-size: 22rpx;
+  color: #ccc;
+  padding: 60rpx 0 40rpx;
+}

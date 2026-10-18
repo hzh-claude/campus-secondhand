@@ -1,0 +1,68 @@
+<!-- Logo区域 -->
+<view class="header">
+  <!-- 本地图片，不依赖网络。
+       原来用的是一张 Unsplash 外链，有两个问题：
+         1. 每次进这个页面都要联网下载，慢；
+         2. 哪天对方把图删了或换了，你的 logo 会变成一片空白 ——
+            而你这边【一条报错都不会有】，只会收到用户说「关于页面是白的」。
+       logo 这种几乎不变的小图，放进项目里最省事也最可靠。 -->
+  <image class="logo" src="/images/logo.jpg" mode="aspectFit"></image>
+  <!-- ⚠️ 这个名字必须和小程序注册名称、app.json 的 navigationBarTitleText
+       保持一致。这里原来写的是「校园二手交易」—— 那是【功能描述】不是应用名，
+       而「关于」页是审核会点进来核对名称的地方。
+       三处对不上，是很容易被要求整改的那种不一致。
+       2026-10-16 统一成「物校角」。
+       ⚠️ 现在这个名字来自 BRAND.APP_NAME（utils/cloud-config.js），
+          不写死在这里。买家换项目只改那一处，别在这一行改回去。 -->
+  <view class="app-name">{{brand.APP_NAME}}</view>
+  <view class="version">版本 1.0.0</view>
+</view>
+
+<!-- 应用介绍 -->
+<view class="intro-section">
+  <view class="section-title">应用介绍</view>
+  <view class="intro-content">
+    {{brand.APP_NAME}}是面向{{brand.SCHOOL_NAME}}在校学生的闲置物品交易平台。在这里，你可以发布自己的闲置物品、浏览同学们出售的商品，通过校内自提或校园配送当面完成交易。
+  </view>
+</view>
+
+<!-- 功能特点 -->
+<view class="feature-section">
+  <view class="section-title">功能特点</view>
+  <view class="feature-list">
+    <view class="feature-item">
+      <van-icon name="shield-o" size="48rpx" color="#FF9500" />
+      <view class="feature-info">
+        <view class="feature-title">安全可靠</view>
+        <view class="feature-desc">限定校内交易，面交验货更放心</view>
+      </view>
+    </view>
+    <view class="feature-item">
+      <van-icon name="gem-o" size="48rpx" color="#FF9500" />
+      <view class="feature-info">
+        <view class="feature-title">品类丰富</view>
+        <view class="feature-desc">数码、教材、生活用品应有尽有</view>
+      </view>
+    </view>
+    <view class="feature-item">
+      <van-icon name="clock-o" size="48rpx" color="#FF9500" />
+      <view class="feature-info">
+        <view class="feature-title">便捷高效</view>
+        <view class="feature-desc">一键发布，快速匹配买卖双方</view>
+      </view>
+    </view>
+    <view class="feature-item">
+      <van-icon name="friends-o" size="48rpx" color="#FF9500" />
+      <view class="feature-info">
+        <view class="feature-title">校友社区</view>
+        <view class="feature-desc">同校交易，信任度更高</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 底部原来有两行开发期的署名和辅导广告，已整块删除。
+     上线给全校用的时候，页面上挂着这类信息既不合规，
+     也不像学校自己的东西。连同 <view class="footer"> 一起去掉，
+     否则会留下一个空容器白占位置。 -->
+

@@ -1,0 +1,9 @@
+{
+  "name": "favorite",
+  "version": "1.0.0",
+  "description": "收藏：查询状态/收藏与取消/我的收藏列表",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

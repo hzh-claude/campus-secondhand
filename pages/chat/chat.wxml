@@ -1,0 +1,113 @@
+<!-- 整页做成上下三段的 flex 竖排：商品条 / 消息区 / 输入条。
+     中间那段 flex:1，剩下的高度全归它，输入条就永远贴在底部。
+     不这么做的话，消息一多整页会被撑长，输入框被顶到屏幕外面去。 -->
+<view class="chat-page">
+
+  <!-- 顶部商品条：聊天是围绕一件具体商品展开的，
+       随时能看到「聊的是哪个东西」，也方便随时点回去看详情 -->
+  <view class="goods-bar" bindtap="onOpenGoods">
+    <image
+      wx:if="{{goodsImage}}"
+      class="goods-thumb"
+      src="{{goodsImage}}"
+      mode="aspectFill"
+    ></image>
+    <view wx:else class="goods-thumb goods-thumb-empty">
+      <van-icon name="photo-o" size="40rpx" color="#ccc" />
+    </view>
+
+    <view class="goods-meta">
+      <view class="goods-title">{{goodsTitle}}</view>
+      <view class="goods-price">¥{{goodsPrice}}</view>
+    </view>
+
+    <van-icon name="arrow" color="#999" />
+  </view>
+
+  <!-- 消息区 -->
+  <scroll-view
+    class="msg-scroll"
+    scroll-y
+    scroll-into-view="{{scrollIntoView}}"
+    scroll-with-animation
+  >
+    <view class="msg-list">
+      <view wx:if="{{loading}}" class="msg-hint">加载中...</view>
+      <view wx:if="{{!loading && messages.length === 0}}" class="msg-hint">
+        还没有消息，打个招呼吧
+      </view>
+
+      <view
+        wx:for="{{messages}}"
+        wx:key="id"
+        id="msg-{{item.id}}"
+        class="msg-row {{item.isMine ? 'mine' : 'theirs'}}"
+      >
+        <!-- 对方的头像只在左边出现；自己的消息不需要头像，
+             这是所有聊天软件的共识，加回来反而显得乱 -->
+        <!-- 对方没设头像时兜底显示默认头像。
+             原来这里是 wx:if / wx:elif 两个分支，顺手把判断简化成
+             只判「是不是我的消息」—— 头像有没有图交给 || 处理。
+             少一层分支，就少一处分支链被打断的机会。 -->
+        <image
+          wx:if="{{!item.isMine}}"
+          class="msg-avatar"
+          src="{{peerAvatar || defaultAvatar}}"
+          mode="aspectFill"
+        ></image>
+
+        <view class="bubble-wrap">
+          <!-- ⚠️ 下面 image 的 wx:if / wx:else 是一对分支，中间【不允许夹注释】——
+               注释在 WXML 里是编译期移除的，有些基础库版本会把分支链断掉，
+               断了不报错，是整个气泡什么都不渲染。
+
+               图片：<image> 组件【认】cloud:// 开头的 fileID，所以 fileID
+                     可以直接当 src 用，不用先换临时链接。
+                     （previewImage 不认，那是另一回事，见 chat.js）
+               mode="widthFix" + CSS 的 max-width：宽度按原图（不超过上限），
+               高度自动跟着走 —— 用 aspectFill 会裁掉图上的一半内容。
+               bindtap 传到 onPreviewImage，用 data-index 定位（不是 fileID，
+               原因见 chat.js 里那段说明）。 -->
+          <image
+            wx:if="{{item.type === 'image'}}"
+            class="bubble-image"
+            src="{{item.fileID}}"
+            mode="widthFix"
+            data-index="{{index}}"
+            bindtap="onPreviewImage"
+          ></image>
+          <!-- 文字气泡。user-select：让用户能长按选中聊天里的数字、地址、
+               电话，这是聊天场景的刚需，默认是关的。
+               图片不需要 user-select（选不出东西，长按该走保存图片）。 -->
+          <view wx:else class="bubble" user-select>{{item.content}}</view>
+          <view class="msg-time">{{item.timeText}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入条 -->
+  <view class="input-bar">
+    <!-- 发图片。放在输入框左边，和所有聊天软件的位置一致。
+         发图片的整条链路（先传云存储、再调云函数过内容安全检测）
+         见 chat.js 的 onChooseImage。 -->
+    <view class="image-btn" bindtap="onChooseImage">
+      <van-icon name="photo-o" size="48rpx" color="#666" />
+    </view>
+    <input
+      class="input"
+      value="{{inputText}}"
+      bindinput="onInput"
+      bindconfirm="onSend"
+      confirm-type="send"
+      confirm-hold
+      maxlength="500"
+      placeholder="说点什么..."
+      placeholder-class="input-placeholder"
+      cursor-spacing="20"
+    />
+    <!-- 有内容才点亮。没内容时是灰的，让「现在还不能发」一目了然 -->
+    <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="onSend">发送</view>
+  </view>
+
+</view>

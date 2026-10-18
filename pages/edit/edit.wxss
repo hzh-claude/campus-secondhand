@@ -1,0 +1,52 @@
+/* pages/edit/edit.wxss */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+.section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  padding: 30rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  background-color: #fff;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+}
+
+/* 「为什么要填这个」的小字。和 pages/register/register.wxss 的
+   .field-tip 是同一套样式，两页的说明文字要长得一样。 */
+.field-tip {
+  font-size: 24rpx;
+  color: #aaa;
+  line-height: 1.6;
+  padding: 16rpx 32rpx 0;
+}
+
+/* 「去完成核验」按钮所在的行 */
+.verify-action {
+  padding: 20rpx 30rpx 0;
+}
+
+/* 原来这里有一条 .avatar-placeholder（灰底 + 居中，配 van-icon 用的）。
+   未设头像时改成显示默认头像图片之后，这个 class 在 WXML 里已经不存在了，
+   留着就是永远不会生效的死代码，所以删掉。 */
+
+.save-section {
+  padding: 40rpx 30rpx;
+}

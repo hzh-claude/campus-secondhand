@@ -1,0 +1,102 @@
+<!-- 顶部说明：把「为什么要填这些」一次讲清，
+     用户对「要交出学号和位置」是有戒心的，不讲清楚他会直接退出 -->
+<view class="hero">
+  <view class="hero-title">完成注册</view>
+  <view class="hero-desc">本平台仅面向{{brand.SCHOOL_NAME}}在校学生开放。完成注册后即可发布和购买闲置物品。</view>
+</view>
+
+<!-- 基本信息 -->
+<view class="section">
+  <view class="section-title">基本信息</view>
+  <van-cell-group>
+    <van-field
+      label="昵称"
+      value="{{nickname}}"
+      placeholder="请输入昵称"
+      required
+      border="{{false}}"
+      maxlength="20"
+      bind:change="onNicknameChange"
+    />
+    <van-field
+      label="真实姓名"
+      value="{{realName}}"
+      placeholder="请输入你的真实姓名"
+      required
+      border="{{false}}"
+      maxlength="20"
+      bind:change="onRealNameChange"
+    />
+    <van-field
+      label="学号"
+      value="{{studentId}}"
+      placeholder="12 位学号"
+      required
+      border="{{false}}"
+      type="number"
+      maxlength="12"
+      bind:change="onStudentIdChange"
+    />
+    <van-cell title="宿舍" value="{{campus || '请选择'}}" is-link bind:click="onSelectCampus" />
+  </van-cell-group>
+  <!-- 2026-10-14：删掉了「只有管理员和你本人能看到」那句，
+       以及「学号前 4 位是入学年份（2022-2026）」那条提示。
+
+       前者的可见范围【规则本身没变】（真名确实只有管理员和本人能看到，
+       见 cloudfunctions/user/index.js 的 syncGoodsSnapshot），
+       删掉的只是这句解释 —— 后果是用户看到要填真名时，
+       可能会犹豫「会不会被买家看到」，进而填个假的。
+
+       后者【规则也还在云函数里】，删掉的只是这条提示：
+       填错年份会在提交时被拒，报错弹窗里才告诉他范围。
+       要让 2022 级之前的老生也能注册，得改的是
+       cloudfunctions/user/index.js 的 STUDENT_ID_MIN_YEAR，
+       不是这个地方。
+
+       剩下这句是【提交前】的提醒，不能省：学号和真名一旦提交就锁死了
+       （见 cloudfunctions/user/index.js 的 updateProfile），
+       而注册页是他唯一能提前看到这句话的地方 —— 等到编辑资料页才发现
+       改不了，已经晚了，而且那时候他只会觉得是程序不让他改。
+       这句和 edit.wxml 里那句是同一条规则的两头，改一处要一起看。 -->
+  <view class="field-tip">真实姓名请填本人姓名。商品页展示的是昵称。</view>
+  <view class="field-tip">学号和真实姓名提交后不能修改，请确认无误再提交；确需修改请联系客服。</view>
+</view>
+
+<!-- 位置核验 -->
+<view class="section">
+  <view class="section-title">位置核验</view>
+  <view class="loc-box">
+    <view class="loc-text loc-{{locStatus}}">{{locText}}</view>
+    <!-- 这个按钮同时是给微信审核看的：使用场景截图要能看出
+         「位置能力被用在了哪里、由谁触发」 -->
+    <van-button
+      size="small"
+      type="default"
+      loading="{{locating}}"
+      bind:click="onGetLocation"
+    >{{locStatus === 'ok' ? '重新获取' : '获取当前位置'}}</van-button>
+  </view>
+  <view class="field-tip">仅用于确认你在学校范围内，注册时获取一次，不会持续定位。</view>
+</view>
+
+<!-- 提交 -->
+<view class="submit-section">
+  <van-button
+    type="warning"
+    block
+    round
+    color="#FF9500"
+    loading="{{submitting}}"
+    bind:click="onSubmit"
+  >完成注册</van-button>
+</view>
+
+<!-- 宿舍选择弹窗 -->
+<van-popup show="{{showCampusPicker}}" position="bottom" bind:close="onCloseCampusPicker">
+  <van-picker
+    show-toolbar
+    columns="{{campusOptions}}"
+    bind:confirm="onConfirmCampus"
+    bind:cancel="onCloseCampusPicker"
+  />
+</van-popup>

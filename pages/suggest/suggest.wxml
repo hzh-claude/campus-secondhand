@@ -1,0 +1,86 @@
+<!-- 这里原来有一条 notice-banner，写着「意见反馈功能开发中，暂未开放提交」。
+     现在功能是真的了，那条横幅就是句假话，整块删掉了。
+     （它是这个页面最值得留下的东西 —— 在功能还没做的时候，它选择了
+      老实告诉用户，而不是弹一句「提交成功」把人打发走。
+      功能做完了，它的使命也就结束了。） -->
+
+<!-- 反馈类型 -->
+<view class="type-section">
+  <view class="section-title">反馈类型</view>
+  <view class="type-list">
+    <view
+      class="type-item {{feedbackType === item.value ? 'active' : ''}}"
+      wx:for="{{typeOptions}}"
+      wx:key="value"
+      bindtap="onSelectType"
+      data-value="{{item.value}}"
+    >
+      {{item.label}}
+    </view>
+  </view>
+</view>
+
+<!-- 反馈内容 -->
+<view class="content-section">
+  <view class="section-title">问题描述</view>
+  <!-- maxlength 读的是 data.contentMax，不是硬写的 500。
+       硬写的话，这个数字就在 WXML 里多出一份副本，而这一份
+       grep FEEDBACK_CONTENT_MAX 搜不到，改常量时必漏。 -->
+  <textarea
+    class="feedback-textarea"
+    placeholder="请详细描述您遇到的问题或建议，我们会认真处理..."
+    maxlength="{{contentMax}}"
+    value="{{content}}"
+    bindinput="onContentInput"
+  ></textarea>
+  <view class="word-count">{{content.length}}/{{contentMax}}</view>
+</view>
+
+<!-- 上传截图 -->
+<view class="image-section">
+  <view class="section-title">上传截图（选填）</view>
+  <view class="image-list">
+    <!-- imageList 里现在装的是 { path, size }，(path 是本地临时路径，
+         点提交时才会上传)。所以这里有 item.path 两处 —— 不是笔误。 -->
+    <view class="image-item" wx:for="{{imageList}}" wx:key="index">
+      <image src="{{item.path}}" mode="aspectFill" bindtap="onPreviewImage" data-index="{{index}}"></image>
+      <view class="delete-btn" catchtap="onDeleteImage" data-index="{{index}}">
+        <van-icon name="cross" size="24rpx" color="#fff" />
+      </view>
+    </view>
+    <!-- 张数上限读 data.imageMax，同样不硬写 3 -->
+    <view class="image-item add-btn" wx:if="{{imageList.length < imageMax}}" bindtap="onAddImage">
+      <van-icon name="plus" size="48rpx" color="#999" />
+      <text>上传图片</text>
+    </view>
+  </view>
+</view>
+
+<!-- 联系方式 -->
+<view class="contact-section">
+  <view class="section-title">联系方式（选填）</view>
+  <input class="contact-input" placeholder="请留下您的手机号或微信，方便我们联系您" value="{{contact}}" bindinput="onContactInput" />
+</view>
+
+<!-- 「我的反馈记录」入口。
+     放在这里而不是塞进「我的」工具箱（TOOL_LIST）：
+     这一行依附于「提交反馈」这件事本身 —— 用户的心智是
+     「我刚反馈了，去哪看」—— 所以它紧挨着提交按钮。
+     塞进工具箱会变成另一组「反馈相关」的重复入口，而且和「意见反馈」
+     挤在同一栏里，用户点之前分不清哪个是哪个。 -->
+<view class="history-entry" bindtap="onOpenMyFeedback">
+  <text>我的反馈记录</text>
+  <van-icon name="arrow" size="28rpx" color="#999" />
+</view>
+
+<!-- 提交按钮 -->
+<view class="submit-section">
+  <!-- 提交中换文案 + 换样式（.submitting）。
+       ⚠️ 用的是新类名，没有复用原来那个 .submit-btn-disabled ——
+          那个类名对应的语义是「功能没做，点不动」，跟「正在提交」是
+          完全相反的两件事，复用它会让后来人以为功能还是没做。
+          死类名和死文案一样会误导人。 -->
+  <view class="submit-btn {{submitting ? 'submitting' : ''}}" bindtap="onSubmit">
+    {{submitting ? '提交中...' : '提交反馈'}}
+  </view>
+</view>

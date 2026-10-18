@@ -1,0 +1,46 @@
+<!-- 开启「订单状态通知」。
+     解决的是这个场景：用户下完单就退出小程序了，卖家什么时候点头
+     他根本不知道，只能反复打开这个页面刷。这条通知就是为了取代「反复刷」。
+
+     必须做成按钮（用户点击触发）：微信规定订阅消息只能在用户点击的
+     上下文里请求，页面自动弹是被禁止的。详见 utils/subscribe.js。 -->
+<!-- 2026-10-14：删掉了「微信限制：每开启一次，可接收 1 条通知」这行说明，
+     并加了 wx:if —— 开过一次就不再显示这条横条。
+     和「我卖出的」那一处改动完全对称，理由见那边更详细的注释。
+     续期入口在「设置」页。 -->
+<view class="notice-bar" wx:if="{{!subscribed}}">
+  <view class="notice-info">
+    <view class="notice-title">订单有结果时通知我</view>
+  </view>
+  <view class="notice-btn" bindtap="onSubscribe">开启</view>
+</view>
+
+<view class="goods-list">
+  <view class="goods-item" wx:for="{{orderList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.goodsId}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <view class="goods-desc">卖家：{{item.sellerName}}</view>
+      <view class="goods-desc">{{item.campus}} · 下单于{{item.time}}</view>
+      <!-- 配送费。走配送的单子才有这一行（isDelivery 判的是有没有
+           delivery 子文档，不是费用真假 —— 自提的单子费用也是 0）。
+           买家在下单页见过这个数，但那时候离收货还隔着卖家确认和
+           配送员接单，收货那天要掏钱的人得能查得到。 -->
+      <view class="goods-desc delivery-line" wx:if="{{item.isDelivery}}">
+        配送费 ¥{{item.deliveryFee}} · 收货时当面付给配送员
+      </view>
+      <!-- 订单被关闭时显示原因，别让用户只知道「关了」不知道为什么 -->
+      <view class="goods-desc reason" wx:if="{{item.reason}}">{{item.reason}}</view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="status {{item.status}}">{{item.statusText}}</view>
+      </view>
+    </view>
+    <!-- catchtap：阻止冒泡，否则点按钮会同时触发卡片的跳转 -->
+    <view class="goods-actions" wx:if="{{item.canCancel}}">
+      <view class="action-btn cancel-btn" catchtap="onCancelTap" data-id="{{item.id}}">取消订单</view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{orderList.length === 0}}" description="{{emptyText}}" />
+</view>

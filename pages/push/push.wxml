@@ -1,0 +1,170 @@
+<!-- 未核验的人看到的空状态页。
+     整张表单都不渲染 —— 不是把它藏起来，是根本不给。
+
+     【为什么让「发布」tab 一直可见，而不是对未注册用户藏掉】
+       藏掉只是「看不见」，服务端该拒还是拒（publishGoods 里的
+       requireVerified 才是门禁）。而且凭空少一个 tab，用户只会以为
+       小程序坏了；留着它、点进来告诉他「怎么才能发布」，更有用。
+       这也是 custom-tab-bar 不按 verified 做判断的原因。
+
+     needRegister 由 onShow 里的 checkVerified() 决定 —— 必须走那个方法，
+     它会先等 login 回来。直接读 globalData.userInfo 的话，冷启动那一刻
+     它是 null，已注册用户会看到这个空状态页。 -->
+<block wx:if="{{needRegister}}">
+  <view class="need-register">
+    <van-empty description="完成校内身份核验后才能发布闲置物品" />
+    <view class="need-register-action">
+      <van-button type="warning" round color="#FF9500" bind:click="onGoRegister">去完成核验</van-button>
+    </view>
+    <view class="need-register-hint">核验需要填写学号、真实姓名和宿舍，并确认你在校内</view>
+  </view>
+</block>
+<view wx:else class="push-form">
+<!-- ⚠️ 这一支的容器是 view 不是 block：block 只是个包装标签，
+     挂不上 class、也就写不了样式，而给发布按钮让位的那句
+     padding-bottom 必须挂在这一层（见 push.wxss）。
+
+     另外，上面那个 wx:if 和这里的 wx:else 之间【不许插注释】——
+     两条分支必须紧挨着。这段注释放在 view 里面就是这个原因。 -->
+<!-- 图片上传区域 -->
+<view class="upload-section">
+  <view class="section-title">商品图片</view>
+  <view class="upload-tip">最多上传9张，可一次选多张，第一张为封面图</view>
+  <!-- multiple：一次能选多张。不加这个，点「+」只能选一张，
+       发 9 张图要点 9 次、开 9 次相册。
+       ⚠️ 加了它之后 after-read 拿到的 file 会从【对象】变成【数组】，
+          push.js 的 afterRead 里必须按数组处理，两处是一套的。
+       ⚠️ Vant 文档注明部分安卓机型不支持 multiple，会自动退回单选 ——
+          那是降级成老行为，不会出错。 -->
+  <van-uploader file-list="{{ fileList }}" max-count="9" multiple bind:after-read="afterRead" bind:delete="deleteImage" upload-icon="photo-o" />
+</view>
+
+<!-- 基本信息 -->
+<view class="form-section">
+  <view class="section-title">基本信息</view>
+  <van-cell-group>
+    <van-field value="{{ title }}" label="商品标题" placeholder="请输入商品标题" required bind:change="onTitleChange" maxlength="30" />
+    <!-- required 只负责画那颗红星【不负责校验】。
+         真正拦住用户的是 push.js 的 onSubmit 里那句 if，
+         以及云函数里的第二道 —— 三处缺一处，这颗星就是骗人的。 -->
+    <van-field value="{{ description }}" label="商品描述" type="textarea" placeholder="请描述商品新旧程度、购买时间等信息" autosize required bind:change="onDescriptionChange" maxlength="200" />
+  </van-cell-group>
+</view>
+
+<!-- 价格信息 -->
+<view class="form-section">
+  <view class="section-title">价格信息</view>
+  <van-cell-group>
+    <!-- 上限写进 placeholder：(0-{{priceMax}}) 比事后弹一句「不能超过」更容易被看到。
+         onPriceChange 里会实时清洗输入，最多 2 位小数、整数部分不超过 4 位。 -->
+    <!-- 售价旁边【不放 ¥ 图标】。
+         放过一段时间，问题是它把这一行的输入框起点往右推了一截，
+         和下面「数量」那一行的输入框对不齐 —— 两行的标签一样宽，
+         但输入框一个在 ¥ 后面、一个紧挨着标签，看着就是没对齐。
+         表头写着「售价」，金额不会有歧义，这个符号不值这点代价。 -->
+    <van-field value="{{ price }}" label="售价" type="digit" placeholder="0-{{priceMax}}，最多两位小数" required bind:change="onPriceChange" />
+    <!-- 数量。右边那个量词跟着分类变（本 / 件 / 个）——
+         它只是显示，真正存进库的是分类本身，量词不落库，是按分类现算的。
+         用 slot="button" 而不是写进 label：label 一长，
+         左边的输入区域就被挤窄，「999」这种三位数都会显示不全。 -->
+    <van-field
+      value="{{ quantity }}"
+      label="数量"
+      type="number"
+      maxlength="3"
+      placeholder="1-{{quantityMax}}"
+      required
+      bind:change="onQuantityChange"
+    >
+      <text slot="button" class="quantity-unit">{{ categoryUnit }}</text>
+    </van-field>
+  </van-cell-group>
+</view>
+
+<!-- 其他信息 -->
+<view class="form-section">
+  <view class="section-title">其他信息</view>
+  <van-cell-group>
+    <van-cell title="商品分类" value="{{ category || '请选择' }}" is-link required bind:click="showCategoryPicker" />
+    <!-- 「交易地点」不是「交易宿舍」的随便换词。
+         campus 这个字段在两处含义不同：商品上表示「在哪儿面交/取货」，
+         用户档案和收货地址上表示「我住在哪儿」。
+         用「交易宿舍」时两个概念共用「宿舍」这个词根，用户会以为自己填的是
+         常驻宿舍；详情页上写「荷园」时，买家也分不清是卖家住荷园
+         还是约在荷园见面。改成「交易地点」后两件事彻底分开。 -->
+    <van-cell title="交易地点" value="{{ campus || '请选择' }}" is-link required bind:click="showCampusPicker" />
+    <!-- 联系方式字段已删除，理由见 push.js 里 data 上方的注释 -->
+  </van-cell-group>
+</view>
+
+<!-- 提交。按钮文案跟着编辑态走（id 为空 = 新建）。
+     这不是装饰：原来这里写死「立即发布」，用户从「我发布的」点「编辑」
+     进来看到的就是「发布闲置 / 立即发布」，他当然以为自己是在新建。 -->
+<view class="submit-section">
+  <van-button type="warning" block round bind:click="onSubmit" color="#FF9500">
+    {{ id ? '保存修改' : '立即发布' }}
+  </van-button>
+  <!-- 编辑态才有的出口。没有它的话，用户想放弃编辑也无路可走 ——
+       保存成功出不去（见 push.js 里 onSubmit 的说明），放弃也出不去。 -->
+  <view class="cancel-edit" wx:if="{{ id }}" bindtap="onCancelEdit">取消编辑</view>
+</view>
+
+<!-- 分类选择器 -->
+<van-popup show="{{ showCategoryPicker }}" position="bottom" bind:close="onCloseCategoryPicker">
+  <van-picker columns="{{ categoryList }}" show-toolbar title="选择分类" bind:confirm="onCategoryConfirm" bind:cancel="onCloseCategoryPicker" />
+</van-popup>
+
+<!-- 交易地点选择器：园区 → 楼栋，两级 -->
+<!--
+  【这里为什么不用 van-picker，而是自己画】
+    1. van-picker 的两列是【各自独立】的，第一列滚到「松园」，第二列
+       不会跟着变成松园的楼栋 —— 要联动必须监听 change 事件、拿到组件实例、
+       再调 setColumnValues 去换第二列。这一串依赖的是组件内部实现，
+       这个项目在 vant 的组件行为上已经栽过两次（glass-easel 下 data-* 不可靠、
+       confirm 事件里 e.detail.value 从字符串变成对象），不想再赌一次。
+    2. 一共就 4 个园区、最多 7 栋楼，是【有限的一小撮选项】。
+       这种规模用轮盘滚是折磨 —— 得滚半天才对准，按钮点一下就到位。
+    3. 自己画的这版是纯 WXML + setData，不依赖任何组件内部行为，
+       以后升 vant 也不会突然坏掉。
+-->
+<van-popup show="{{ showCampusPicker }}" position="bottom" bind:close="onCloseCampusPicker">
+  <view class="loc-picker">
+    <view class="loc-picker-head">
+      <text class="loc-picker-action" bindtap="onCloseCampusPicker">取消</text>
+      <text class="loc-picker-title">选择交易地点</text>
+      <text class="loc-picker-action loc-picker-ok" bindtap="onConfirmCampus">确定</text>
+    </view>
+
+    <!-- 这一栏叫「宿舍」而不是「园区」：对用户来说「松园」就是一片宿舍区，
+         说「园区」反而像在说工业园区 / 教学区，看不出该挑什么。
+         ⚠️ 只改了【给用户看的这行字】。代码里 CAMPUS_GROUPS / campus 字段 /
+            云函数的 CAMPUS_ROOTS 全都还是「园区」那套叫法，
+            动它们要连带改 utils/campus.js、两个云函数的校验、以及库里的存量数据。 -->
+    <view class="loc-picker-sub">宿舍</view>
+    <view class="loc-groups">
+      <view
+        wx:for="{{ campusGroups }}"
+        wx:key="name"
+        class="loc-chip {{ item.name === tempCampus ? 'loc-chip--on' : '' }}"
+        data-name="{{ item.name }}"
+        bindtap="onPickCampusGroup"
+      >{{ item.name }}</view>
+    </view>
+
+    <view class="loc-picker-sub">楼栋</view>
+    <!-- 有楼栋可选时才画这一片。竹园的 buildings 是空数组，
+         走下面的 wx:else 分支说清楚「不用选」——
+         直接留白的话，用户会以为楼栋没加载出来，在那儿反复点。 -->
+    <view class="loc-buildings" wx:if="{{ tempBuildings.length > 0 }}">
+      <view
+        wx:for="{{ tempBuildings }}"
+        wx:key="*this"
+        class="loc-chip loc-chip--small {{ item === tempBuilding ? 'loc-chip--on' : '' }}"
+        data-value="{{ item }}"
+        bindtap="onPickBuilding"
+      >{{ item }}</view>
+    </view>
+    <view class="loc-picker-empty" wx:else>{{ tempCampus }}只有一栋，不用再选楼栋</view>
+  </view>
+</van-popup>
+</view>

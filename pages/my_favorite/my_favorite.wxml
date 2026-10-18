@@ -1,0 +1,19 @@
+<view class="goods-list">
+  <view class="goods-item" wx:for="{{favoriteList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.id}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <view class="goods-desc">{{item.campus}} · 收藏于{{item.favTime}}</view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="status {{item.available ? 'on-sale' : 'unavailable'}}">{{item.statusText}}</view>
+      </view>
+    </view>
+    <!-- catchtap：阻止冒泡，否则点按钮会同时触发卡片的 onGoodsTap 跳去详情页 -->
+    <view class="goods-actions">
+      <view class="action-btn cancel-btn" catchtap="onCancelTap" data-id="{{item.id}}">取消收藏</view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{favoriteList.length === 0}}" description="{{emptyText}}" />
+</view>

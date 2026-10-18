@@ -1,0 +1,138 @@
+/* components/goods-card/index.wxss */
+
+/* 这份样式以前在 home / type_list / search 里各有一份，逐字相同。
+   现在只有这一份 —— 改卡片长相只改这里。
+
+   注意 .goods-list（外层容器，flex 换行 + 两端对齐）【不在这里】：
+   它属于页面，页面要自己留着。 */
+
+/* ============================================================
+   ⚠️ 卡片占多宽，必须写在 :host 上，【不能】写在 .goods-item 上
+   ============================================================
+
+   这是抽组件时最容易踩的坑，这个项目已经踩过一次（首页卡片塌成一条窄缝，
+   图片被挤成竖条、文字在下面竖着堆）：
+
+   卡片被抽成组件之后，页面里 .goods-list（flex 容器）的直接子元素
+   变成了 <goods-card> 这个【宿主节点】—— .goods-item 被宿主包了一层，
+   它不再是一个 flex item 了。
+
+   于是 width: calc(50% - 10rpx) 写在 .goods-item 上就失效了，而且是
+   一种最麻烦的失效方式：不报错、不警告，只是布局塌掉。链路是这样断的：
+       容器按 flex 规则给宿主算宽度
+         → 宿主自己没设宽度，按内容撑
+           → 内容里的 .goods-item 又要「宿主宽度的 50%」
+             → 循环依赖，最后谁也定不下来
+
+   :host 选中的正是那个宿主节点，这就是它存在的意义。
+   vant 自己的组件也这么用（tabbar-item 里的 :host{flex:1}）。 */
+:host {
+  width: calc(50% - 10rpx);
+  /* 宿主节点放在 flex 容器里会被自动块级化，这一行是给
+     「哪天被放进非 flex 容器」的情况兜底的 */
+  display: block;
+}
+
+.goods-item {
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  margin-bottom: 20rpx;
+}
+
+.goods-image {
+  width: 100%;
+  height: 340rpx;
+}
+
+.goods-info {
+  padding: 20rpx;
+}
+
+.goods-title {
+  font-size: 28rpx;
+  color: #333;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.4;
+  height: 78rpx;
+  margin-bottom: 16rpx;
+}
+
+/* 搜索页命中关键词的那一段。
+   用浅橙底而不是加粗/变色：加粗会改变字宽导致整行重排，
+   两行截断的位置会跳；底色不动字形，最稳。 */
+.hl {
+  background-color: #FFE7C4;
+  color: #E07B00;
+  border-radius: 4rpx;
+}
+
+.goods-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.goods-price {
+  font-size: 32rpx;
+  color: #FF9500;
+  font-weight: bold;
+}
+
+.goods-views {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.goods-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40rpx;
+}
+
+/* 卖家主页专用：这一行只剩「交易地点」一个孩子。
+   space-between 对单个孩子是【左对齐】，地点会跑到左下角 ——
+   和首页 / 分类页（地点在右下角）看着像两种卡片。
+   显式推回右边，和别处保持一致。 */
+.footer-solo {
+  justify-content: flex-end;
+}
+
+.publisher-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.publisher-avatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+  /* 兜底图是浅蓝底的，加一层浅灰背景是为了：万一连默认图都没加载出来，
+     这里是一个灰色圆点而不是一块透明 —— 至少布局不塌 */
+  background-color: #f0f0f0;
+}
+
+.publisher-nickname {
+  font-size: 24rpx;
+  color: #666;
+  max-width: 120rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 40rpx;
+}
+
+.goods-campus {
+  font-size: 22rpx;
+  color: #999;
+  display: flex;
+  align-items: center;
+  line-height: 40rpx;
+}

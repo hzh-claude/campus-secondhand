@@ -1,0 +1,49 @@
+/* pages/type_list/type_list.wxss */
+page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 筛选栏（原生 picker） */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  height: 88rpx;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1rpx solid #eee;
+}
+
+.filter-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.filter-value {
+  margin-right: 8rpx;
+}
+
+/* 商品列表容器 */
+.goods-container {
+  padding: 20rpx;
+}
+
+.goods-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* 卡片本身的样式已全部搬进 components/goods-card/index.wxss。
+   这里不要再留副本 —— 页面留一份同名的会盖住组件里的，
+   改组件样式改半天没反应就是这个原因。
+
+   卡片占多宽也归组件管，写在组件的 :host 里。
+   这里只留容器：flex 换行 + 两端对齐，和组件的宽度是一对。 */

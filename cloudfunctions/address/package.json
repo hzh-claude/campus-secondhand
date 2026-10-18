@@ -1,0 +1,9 @@
+{
+  "name": "address",
+  "version": "1.0.0",
+  "description": "收货地址管理：列表/新增/修改/删除/设为默认",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

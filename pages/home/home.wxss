@@ -1,0 +1,182 @@
+/* pages/home/home.wxss */
+page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
+}
+
+/* 搜索栏 */
+.search-box {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* 轮播图 */
+.banner-box {
+  padding: 20rpx;
+}
+
+.banner-swiper {
+  height: 320rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+/* 每一屏轮播。不用 <image>，是渐变底 + 两行字：
+   零网络依赖，也就没有「域名没配 → 白框」这条失败路径。
+   改回图片时把这个换成 .banner-image { width/height: 100% } 即可。 */
+.banner-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 48rpx;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+/* 三屏不同的渐变。刻意都压在同一族暖色里 ——
+   轮播图是背景板，不是三个独立广告位，颜色跳太开会把首页打散。 */
+.banner-slide-a {
+  background: linear-gradient(135deg, #FF9500 0%, #FFC46B 100%);
+}
+
+.banner-slide-b {
+  background: linear-gradient(135deg, #FF7A33 0%, #FFAE6B 100%);
+}
+
+.banner-slide-c {
+  background: linear-gradient(135deg, #E8890C 0%, #FFD08A 100%);
+}
+
+.banner-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+
+/* 第二行压暗一档而不是改颜色：
+   白色底色上直接调透明度，任何一屏渐变上都读得清。 */
+.banner-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  opacity: 0.85;
+}
+
+/* 分类金刚区 */
+.category-box {
+  background-color: #fff;
+  margin: 0 20rpx;
+  border-radius: 16rpx;
+  padding: 30rpx 20rpx;
+}
+
+.category-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* 25% × 4 = 正好一行铺满。
+   ⚠️ 这个数要跟着 categoryList 的【项数】走，两者是一对：
+     原来是三个分类配 20%（五列的格子只占三格，靠左排，
+     右边空着一格的位置）。
+     现在加到四个分类，如果还是 20%，四个入口会挤在左边 80% 里，
+     右边留一条空 —— 看着像第五个分类没加载出来。
+     以后再加分类，除一下改这个数。 */
+.category-item {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.category-icon {
+  width: 88rpx;
+  height: 88rpx;
+  background: linear-gradient(135deg, #FFF5E6 0%, #FFE4C4 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+}
+
+.category-name {
+  font-size: 24rpx;
+  color: #333;
+}
+
+/* 闲置物品列表 */
+.goods-section {
+  margin-top: 20rpx;
+  padding: 0 20rpx;
+}
+
+.section-header {
+  padding: 20rpx 0;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  padding-left: 20rpx;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8rpx;
+  height: 32rpx;
+  background-color: #FF9500;
+  border-radius: 4rpx;
+}
+
+.goods-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* ============================================================
+   空状态「还没有在售的商品」
+   ============================================================
+   它自己一层容器，只干一件事：把 van-empty 横向摆到中间。
+
+   【为什么不跟商品卡片共用 .goods-list】
+     .goods-list 是两列网格的容器（flex 换行 + 两端对齐），为
+     「一排两张卡」设计的。空状态放进去就成了它的 flex 子项：
+       · 宽度被缩成内容宽（插画 160px，加上文案的内边距约 232px），
+         van-empty 自己的宽度是随内容的，不会撑满；
+       · 而 space-between 只有一项时 = 摆到最左边。
+     两个一起作用，插画和文案就贴到左边去了。这个容器只该装卡片。
+
+   这里不需要写 align-items / text-align —— .van-empty 内部已经是
+   column flex 且自己居中了，宽度也不用管，由 flex 居中解决。 */
+.empty-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+/* 卡片本身的样式（.goods-item / .goods-image / .goods-info / .goods-title /
+   .goods-price-row / .goods-price / .goods-views / .goods-footer /
+   .publisher-info / .publisher-avatar / .publisher-nickname / .goods-campus）
+   已经全部搬进 components/goods-card/index.wxss。
+
+   这里【不要】再留一份副本：组件的样式隔离只管「组件往外漏」，
+   管不住「页面往里渗」—— 页面留一份同名的，它反而会盖住组件里的，
+   改组件样式改半天没反应，就是这个原因。
+
+   只留 .goods-list：它是「两列布局的容器」，属于页面，组件不管这个。
+
+   两列布局是【一对】配出来的，缺一个都塌：
+     这里  → 容器 flex 换行 + 两端对齐
+     组件里 → :host { width: calc(50% - 10rpx) }
+   卡片占多宽归组件管（写在组件的 :host 里），这里别插一脚。 */

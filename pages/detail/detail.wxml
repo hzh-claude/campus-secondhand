@@ -1,0 +1,307 @@
+<!-- 图片轮播 -->
+<view class="image-section">
+  <swiper class="image-swiper" bindchange="onSwiperChange" circular>
+    <swiper-item wx:for="{{goodsInfo.images}}" wx:key="index">
+      <image class="goods-image" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="previewImage"></image>
+    </swiper-item>
+  </swiper>
+  <view class="image-indicator">{{currentImageIndex + 1}}/{{goodsInfo.images.length}}</view>
+</view>
+
+<!-- 价格信息 -->
+<view class="price-section">
+  <view class="price-row">
+    <!-- priceText 是 JS 里 formatPrice 过的字符串。用 goodsInfo.price 的话，
+         遇到库里 1e25 这类脏数据会显示成「¥1e+25」。 -->
+    <text class="current-price">¥{{goodsInfo.priceText}}</text>
+  </view>
+  <view class="stats-row">
+    <text class="views">{{goodsInfo.views}}人浏览</text>
+    <text class="favorites">{{favoriteCount}}人收藏</text>
+  </view>
+</view>
+
+<!-- 商品标题 -->
+<view class="title-section">
+  <text class="goods-title">{{goodsInfo.title}}</text>
+  <!-- 分类 / 交易地点 / 数量。
+       【交易地点以前根本没显示】—— 卖家发布时填了它，商品卡片上也印着，
+       唯独真正要见面的这一页没有。买家看完详情还不知道该去哪儿找人，
+       只能去翻聊天记录。三个标签里，这一个是最该有的。
+
+       数量不带 wx:if：为 1 的时候也显示（「1本」），
+       不然卖家填了数量、进来一看没有，会以为没存上。
+       分类和地点则可能为空（老数据），空标签会是个空壳，所以带 wx:if。 -->
+  <view class="tags">
+    <text class="tag-category" wx:if="{{goodsInfo.category}}">{{goodsInfo.category}}</text>
+    <text class="tag-campus" wx:if="{{goodsInfo.campus}}">{{goodsInfo.campus}}</text>
+    <text class="tag-quantity">{{goodsInfo.quantity}}{{goodsInfo.unit}}</text>
+  </view>
+</view>
+
+<!-- 商品描述 -->
+<view class="desc-section">
+  <view class="section-title">商品描述</view>
+  <text class="goods-desc">{{goodsInfo.description}}</text>
+  <view class="publish-time">发布于 {{goodsInfo.publishTime}}</view>
+</view>
+
+<!-- 卖家信息 -->
+<view class="seller-section" bindtap="onViewSeller">
+  <view class="seller-info">
+    <!-- 卖家没设头像时兜底显示默认头像。
+         这里原来是 wx:if / wx:else 两个分支（灰色小人图标），
+         改成一行 || 之后分支没了 —— 少一对分支就少一处
+         「wx:if 链被注释打断」的风险，也让全项目的空头像长得一样。 -->
+    <image class="seller-avatar" src="{{goodsInfo.publisher.avatar || defaultAvatar}}" mode="aspectFill"></image>
+    <view class="seller-detail">
+      <text class="seller-name">{{goodsInfo.publisher.nickname}}</text>
+      <view class="seller-stats">
+        <text>发布 {{goodsInfo.publisher.publishCount}}</text>
+        <text>卖出 {{goodsInfo.publisher.soldCount}}</text>
+      </view>
+    </view>
+  </view>
+  <van-icon name="arrow" color="#999" />
+</view>
+
+<!-- 温馨提示 -->
+<view class="tips-section">
+  <van-divider contentPosition="center">温馨提示</van-divider>
+  <view class="tips-content">
+    <view class="tip-item">
+      <van-icon name="shield-o" color="#FF9500" size="32rpx" />
+      <text>建议当面交易，确认商品后再付款</text>
+    </view>
+    <view class="tip-item">
+      <van-icon name="location-o" color="#FF9500" size="32rpx" />
+      <text>仅限校内交易，请选择安全的交易地点</text>
+    </view>
+  </view>
+</view>
+
+<!-- 开发模式提示条 -->
+<!-- 只在「开发开关打开 + 这是自己的商品」时出现。
+     为什么要明写出来：这一屏的按钮对真实买家是正常的，对你却是不正常的
+     （正常交易里你不能买自己的东西）。不标一下，下次看到会以为出了 bug。 -->
+<view class="dev-banner" wx:if="{{isOwner && devSelfBuy}}">
+  开发模式 · 上线前把 DEV_ALLOW_SELF_BUY 改为 false
+</view>
+
+<!-- 底部操作栏 -->
+<!-- 不放在滚动内容流里，而是 position: fixed 吸底，
+     这样翻到哪儿都点得到 —— 详情页的转化按钮必须在视线内 -->
+<view class="action-bar">
+  <!-- ============ 客服 ============
+       微信原生客服会话，和「我的 → 联系客服」（pages/concat）是同一条通道：
+       点一下直接进微信的客服会话窗口，消息进 mp 后台的客服系统，
+       不经过本项目的云函数和数据库。
+
+       ⚠️ 必须是 <button>，不能写成旁边那种 <view>：open-type 是 button
+          独有的属性，写在 view 上是【静默无效】的 —— 界面看着一模一样，
+          点下去什么都不发生，最难查。
+
+       ⚠️ 它不参与下面那条 wx:if / wx:else 分支，两个分支里都有它。
+          客服不是买家专属的动作 —— 自己的商品被下架了，也要有个地方问。
+          所以它是 .action-bar 的第一个子元素，排在分支链【外面】。
+
+       ⚠️ 但它【显示在收藏右边】，不是这儿。位置由 wxss 里的 order 说了算
+          （.service-btn { order: 1 }，收藏是默认的 0，按钮栏是 2）。
+          想把它挪回左数第一个，删掉那条 order 就行 ——
+          改这里的先后顺序没用，那不是决定位置的地方。
+
+       ⚠️ 代码之外的前提：「客服功能」已开通并绑定了客服人员。
+          没做的话按钮点下去毫无反应（不报错、不弹窗）。
+          本页没有兜底路径 —— concat 页有，需要时从「我的」进去。 -->
+  <button class="action-icon service-btn" open-type="contact" bindcontact="onServiceContact">
+    <van-icon name="service-o" size="44rpx" color="#666" />
+    <text class="action-icon-text">客服</text>
+  </button>
+
+  <!-- 自己的商品本来整条换成一个管理入口；
+       但开发模式下要能测收藏和下单，所以保持买家视角的形态 ——
+       这样你看到的和真实买家看到的完全一致，测出来的才算数 -->
+  <block wx:if="{{!isOwner || devSelfBuy}}">
+    <view class="action-icon" bindtap="onFavorite">
+      <van-icon
+        name="{{isFavorite ? 'star' : 'star-o'}}"
+        size="44rpx"
+        color="{{isFavorite ? '#FF9500' : '#666'}}"
+      />
+      <text class="action-icon-text {{isFavorite ? 'active' : ''}}">收藏</text>
+    </view>
+
+    <view class="action-buttons">
+      <!-- 买家看到「聊一聊」；自己的商品上跟自己聊没意义，那个位置换成管理入口 -->
+      <view wx:if="{{isOwner}}" class="btn btn-contact" catchtap="onManage">管理</view>
+      <view wx:else class="btn btn-contact" catchtap="onContact">聊一聊</view>
+
+      <!-- 已下架 / 已售出 / 已被别人预订的商品都不能再下单。
+           priceBad 是「标价不合法」的历史脏数据，同样不可下单 ——
+           云函数 order.create 也会拒，这里只是让它一眼看得出来。 -->
+      <view
+        class="btn btn-buy {{goodsInfo.status !== 'on_sale' || priceBad ? 'btn-disabled' : ''}}"
+        catchtap="onBuy"
+      >
+        {{buyText}}
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="action-buttons">
+    <view class="btn btn-owner" catchtap="onManage">管理我发布的商品</view>
+  </view>
+</view>
+
+<!-- ============================================================
+     下单弹层
+     ============================================================
+     从底部升起。里面是买家下单前要做的全部决定：
+       ① 怎么拿到货（自提 / 校内配送）
+       ② 选配送的话，送到哪
+       ③ 配送费怎么算（只告知，不由买家选）
+
+     为什么从 wx.showModal 换成弹层：那个只能显示一段文字 + 两个按钮，
+     现在要选的东西从 0 个变成了 2 个，还得列地址，它装不下。
+
+     滚动是这样分的：弹层自身撑到 82vh 就不再长，中间的
+     .sheet-body 自己滚，底部按钮【钉住不动】——
+     地址列表一长，按钮滚出屏幕就没人找得到它了。
+     （.van-popup 自己也带 overflow-y:auto，这里靠 max-height 把它压住，
+       不让它抢着滚。） ============================================================ -->
+<van-popup
+  show="{{showOrderSheet}}"
+  position="bottom"
+  round
+  bind:close="onCloseSheet"
+>
+  <view class="sheet">
+    <view class="sheet-header">
+      <text class="sheet-title">确认下单</text>
+      <van-icon name="cross" size="36rpx" color="#999" bindtap="onCloseSheet" />
+    </view>
+
+    <view class="sheet-body">
+      <view class="sheet-label">取货方式</view>
+
+      <view
+        class="type-item {{deliveryType === 'self' ? 'active' : ''}}"
+        bindtap="onSelectSelf"
+      >
+        <van-icon
+          name="shop-o"
+          size="44rpx"
+          color="{{deliveryType === 'self' ? '#FF9500' : '#bbb'}}"
+        />
+        <view class="type-text">
+          <text class="type-name">自提</text>
+          <text class="type-desc">和卖家约个地点当面交易</text>
+        </view>
+        <van-icon
+          wx:if="{{deliveryType === 'self'}}"
+          name="success"
+          size="36rpx"
+          color="#FF9500"
+        />
+      </view>
+
+      <view
+        class="type-item {{deliveryType === 'delivery' ? 'active' : ''}}"
+        bindtap="onSelectDelivery"
+      >
+        <van-icon
+          name="logistics"
+          size="44rpx"
+          color="{{deliveryType === 'delivery' ? '#FF9500' : '#bbb'}}"
+        />
+        <view class="type-text">
+          <text class="type-name">校内配送</text>
+          <text class="type-desc">送到你填的宿舍地址</text>
+        </view>
+        <van-icon
+          wx:if="{{deliveryType === 'delivery'}}"
+          name="success"
+          size="36rpx"
+          color="#FF9500"
+        />
+      </view>
+
+      <block wx:if="{{deliveryType === 'delivery'}}">
+        <view class="sheet-label sheet-label-row">
+          <text>收货地址</text>
+          <text class="label-add" catchtap="onAddAddress">+ 新增</text>
+        </view>
+
+        <!-- ⚠️ 下面这三条 wx:if / wx:elif / wx:else 是一整条链，
+             中间【不许夹注释】—— 注释在编译期被移除，有些基础库版本
+             移得掉、有些会把链断掉；断了不报错，整块什么都不渲染。
+             要说的话都写在链外面。 -->
+        <view wx:if="{{addressLoading}}" class="addr-state">地址加载中...</view>
+
+        <view wx:elif="{{addressList.length === 0}}" class="addr-state">
+          <text>你还没有收货地址</text>
+          <view class="addr-add-btn" catchtap="onAddAddress">新增收货地址</view>
+        </view>
+
+        <view wx:else class="addr-list">
+          <view
+            wx:for="{{addressList}}"
+            wx:key="id"
+            class="addr-item {{addressId === item.id ? 'active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onSelectAddress"
+          >
+            <view class="addr-body">
+              <view class="addr-line1">
+                <text class="addr-name">{{item.name}}</text>
+                <text class="addr-phone">{{item.phone}}</text>
+                <text class="addr-tag" wx:if="{{item.isDefault}}">默认</text>
+              </view>
+              <view class="addr-line2">{{item.campus}} {{item.detail}}</view>
+            </view>
+            <van-icon
+              wx:if="{{addressId === item.id}}"
+              name="success"
+              size="36rpx"
+              color="#FF9500"
+            />
+          </view>
+        </view>
+
+        <!-- 配送费。这里【直接报出确切金额】，不再列价目表。
+             老规则下配送员看实物判大小，下单时算不出买家该付几块，
+             只能把两个价都列出来加一句「具体多少等配送员定」——
+             那不是报价，是提前打预防针，而预防针扎得再早，
+             收货时那 1 块钱的争执还是在。
+             现在档位由商品单价定，下单这一刻就是确定的，所以直接说数。
+
+             下面那句解释在 JS 里拼好（deliveryFeeNote）——
+             WXML 里算不了「这件商品标价多少、超没超过那条线」，
+             硬要用三元表达式拼会变成一坨读不懂的字符。
+             注意它【不提「大件」「小件」】：这两个词现在指的是价格档，
+             跟体积没关系了，对着 ¥250 的教材说「按大件算」只会让人更糊涂。 -->
+        <view class="fee-box">
+          <view class="fee-row">
+            <text class="fee-label">配送费</text>
+            <text class="fee-value">¥{{deliveryFee}}</text>
+          </view>
+          <view class="fee-note">{{deliveryFeeNote}}</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 底部按钮钉住。
+         注意【没有】加 env(safe-area-inset-bottom) 的 padding ——
+         van-popup 的 safeAreaInsetBottom 默认就是 true，它自己会补，
+         这里再加一次就是双重留白，全面屏上会空出好大一截 -->
+    <view class="sheet-footer">
+      <view
+        class="sheet-btn {{(deliveryType === 'delivery' && !addressId) ? 'disabled' : ''}}"
+        catchtap="confirmOrder"
+      >
+        {{buying ? '提交中...' : '确认下单'}}
+      </view>
+    </view>
+  </view>
+</van-popup>
+

@@ -1,0 +1,9 @@
+{
+  "name": "notice",
+  "version": "1.0.0",
+  "description": "站内通知云函数：列表 / 未读数 / 标记已读",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

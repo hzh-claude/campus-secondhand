@@ -1,0 +1,13 @@
+{
+  "usingComponents": {
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index",
+    "van-field": "@vant/weapp/field/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-popup": "@vant/weapp/popup/index",
+    "van-picker": "@vant/weapp/picker/index"
+  },
+  "navigationBarTitleText": "完成注册",
+  "navigationBarBackgroundColor": "#FF9500",
+  "navigationBarTextStyle": "white"
+}

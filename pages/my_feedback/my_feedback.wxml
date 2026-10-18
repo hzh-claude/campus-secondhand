@@ -1,0 +1,49 @@
+<!-- 只读列表。这里没有撤回/编辑/删除按钮，是故意的：
+     反馈一旦发出去就该是留给管理员的记录，用户能改的话它就不算数了。
+     状态由管理员在云开发控制台改，见 cloudfunctions/feedback/index.js 顶部。 -->
+<view class="container">
+  <view class="feedback-item" wx:for="{{list}}" wx:key="id">
+    <view class="item-head">
+      <view class="type-tag">{{item.typeText}}</view>
+      <!-- 颜色跟着 done 走。注意 item.done 是【服务端返回的 status 精确
+           等于 'done'】算出来的，不是「不等于 pending」—— 管理员在控制台
+           打错一个字最坏只会显示「处理中」，不会把没处理的显示成已处理。 -->
+      <view class="status-tag {{item.done ? 'done' : 'pending'}}">{{item.statusText}}</view>
+    </view>
+
+    <!-- pre-wrap：用户输入里的换行要留着。合并成一段的话，
+         分点写的反馈会变成一大坨字。 -->
+    <view class="item-content">{{item.content}}</view>
+
+    <!-- 截图缩略图。
+         wx:key 用 *this 而不是下标 —— images 里是 fileID 字符串，
+         fileID 带时间戳+随机数，天然唯一。
+         （内层 wx:for 必须把 item/index 改名，否则会把外层的 item 盖掉，
+           下面 data-id="{{item.id}}" 就会取到那个字符串。） -->
+    <view class="image-row" wx:if="{{item.images.length}}">
+      <image
+        class="thumb"
+        wx:for="{{item.images}}"
+        wx:for-item="img"
+        wx:key="*this"
+        wx:for-index="imgIndex"
+        src="{{img}}"
+        mode="aspectFill"
+        bindtap="onPreviewImage"
+        data-id="{{item.id}}"
+        data-index="{{imgIndex}}"
+      ></image>
+    </view>
+
+    <!-- 管理员回复。reply 为空时整块不渲染 —— 空着会留一个空白框，
+         用户会以为回复还没加载出来。 -->
+    <view class="reply-box" wx:if="{{item.reply}}">
+      <view class="reply-label">管理员回复</view>
+      <view class="reply-text">{{item.reply}}</view>
+    </view>
+
+    <view class="item-time">提交于 {{item.time}}</view>
+  </view>
+
+  <van-empty wx:if="{{list.length === 0}}" description="{{emptyText}}" />
+</view>

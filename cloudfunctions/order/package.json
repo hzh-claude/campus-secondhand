@@ -1,0 +1,9 @@
+{
+  "name": "order",
+  "version": "1.0.0",
+  "description": "订单：下单/确认/关闭/我买到的/我收到的",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

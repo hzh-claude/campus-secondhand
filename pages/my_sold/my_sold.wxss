@@ -1,0 +1,203 @@
+/* pages/my_sold/my_sold.wxss */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 开启通知的横条。
+   用浅橙底而不是白底：它不是一个内容区块，是一个「要做点什么」的提示。
+   和「待你确认的订单」的橙色小竖条是同一套视觉语言。 */
+.notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #FFF3E0;
+  margin: 20rpx 20rpx 0;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+.notice-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.notice-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 说明文字比标题小一号、颜色浅一档：它重要，但不是主角 */
+.notice-sub {
+  font-size: 22rpx;
+  color: #E67700;
+  margin-top: 6rpx;
+}
+
+.notice-btn {
+  flex-shrink: 0;
+  padding: 14rpx 36rpx;
+  background-color: #FF9500;
+  color: #fff;
+  font-size: 26rpx;
+  border-radius: 32rpx;
+}
+
+/* 页面分成「待确认订单」和「已卖出」两段 */
+.section {
+  padding: 20rpx 20rpx 0;
+}
+
+.section:last-child {
+  padding-bottom: 20rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  padding: 10rpx 0 20rpx;
+}
+
+/* 标题前的小橙条，用来强调「这一段需要你行动」 */
+.badge {
+  width: 8rpx;
+  height: 28rpx;
+  border-radius: 4rpx;
+  background: #FF9500;
+  margin-right: 12rpx;
+}
+
+.goods-item {
+  display: flex;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.goods-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+
+.goods-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.goods-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.goods-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.goods-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10rpx;
+}
+
+.price {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FF9500;
+}
+
+.status {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.status.sold {
+  background-color: #07c160;
+  color: #fff;
+}
+
+/* 操作按钮区（和「我发布的」保持一致的样式） */
+.goods-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15rpx;
+  margin-left: 15rpx;
+}
+
+.action-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+/* 撤销卖出按钮 */
+.undo-btn {
+  background-color: #fff;
+  color: #FF9500;
+  border: 1rpx solid #FF9500;
+}
+
+/* 待确认订单的状态标签：橙色，和灰色的「已下架」区分开 */
+.status.pending {
+  background-color: #FFF3E0;
+  color: #FF9500;
+}
+
+/* 买家昵称：比普通灰色说明文字重一点，这是卖家最关心的信息 */
+.goods-desc.buyer {
+  color: #333;
+  font-weight: 500;
+}
+
+/* 配送标记。
+   它嵌在 .goods-desc.buyer 里面，会继承到 #333 和粗体 ——
+   所以颜色、字重、字号都得显式覆写回来，不然它长得和买家昵称
+   一模一样，读起来像「买家：张三 校内配送」是一个人的名字。
+   用蓝色（跟「校内配送」在别处的图标色一致），和橙色主色调区分开：
+   它不是要你点的东西，只是一个说明。 */
+.delivery-tag {
+  display: inline-block;
+  margin-left: 12rpx;
+  padding: 2rpx 12rpx;
+  font-size: 20rpx;
+  font-weight: normal;
+  color: #1989fa;
+  background-color: #E8F3FF;
+  border-radius: 4rpx;
+}
+
+/* 确认卖出：主操作，用实心橙 */
+.confirm-btn {
+  background-color: #FF9500;
+  color: #fff;
+}
+
+/* 拒绝：次要操作，用描边，避免误点 */
+.reject-btn {
+  background-color: #fff;
+  color: #999;
+  border: 1rpx solid #ddd;
+}

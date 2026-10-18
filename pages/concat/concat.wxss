@@ -1,0 +1,124 @@
+/* pages/concat/concat.wxss */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.service-avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.service-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.service-desc {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* ============ 原生客服按钮 ============
+   button 是小程序的【原生组件】，它带的默认样式（灰色背景、
+   圆角、那条 1rpx 的边框）不是普通写在 class 里就能覆盖掉的：
+   边框其实是 ::after 伪元素画的，必须单独点掉，
+   否则会出现「橙色按钮外面还镶着一圈灰线」。
+   这块写法和项目里其它原生 button 的复位保持一致。 */
+.contact-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 420rpx;
+  height: 84rpx;
+  margin-top: 32rpx;
+  padding: 0;
+  background-color: #FF9500;
+  color: #fff;
+  font-size: 30rpx;
+  line-height: 1; /* 不设的话 button 的默认 line-height 会把文字顶偏 */
+  border-radius: 42rpx;
+}
+
+/* 去掉原生 button 的默认边框（它画在 ::after 上，不是 border 属性） */
+.contact-btn::after {
+  border: none;
+}
+
+/* 按钮按下去要有反馈。原生 button 默认的 hover 是灰底，
+   和橙色主色不搭，这里换成加深一档的橙。 */
+.contact-btn.button-hover {
+  background-color: #e08600;
+}
+
+/* 按钮下面那行小字。
+   它存在的理由是：客服功能没在后台开通时，按钮点下去毫无反应，
+   用户会以为是小程序坏了。这行字提前把「这个按钮依赖后台配置」
+   说出来，至少让他知道该去哪问，而不是反复戳。 */
+.contact-btn-note {
+  margin-top: 20rpx;
+  padding: 0 60rpx;
+  font-size: 22rpx;
+  color: #bbb;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ============ 兜底邮箱 ============
+   2026-10-15 加回来的。刻意做得【比按钮弱】：小字、灰色、没有背景块。
+   它是退路不是主路 —— 做得太显眼（比如再来一个橙色大按钮），
+   用户会分不清该点哪个，邮件回复又慢。
+   摆在这里的定位是「客服按钮点不动的时候，往下看一眼还有没有别的路」。
+
+   整行可点（bindtap 在父 view 上），所以需要 line-height 撑开高度，
+   让手指点得中 —— 22rpx 的字单行太矮，触控区域不够。
+   不用 hover-class：这行不是按钮，按下去变个色反而像可点的主操作。 */
+.contact-email {
+  margin-top: 24rpx;
+  padding: 0 60rpx;
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.8;
+  text-align: center;
+}
+
+/* 邮箱本身给个主色 + 下划线，让人一眼看出「这串字符是要复制的东西」，
+   和前面那半句普通说明文字区分开。 */
+.contact-email-value {
+  color: #FF9500;
+  text-decoration: underline;
+}
+
+/* 原来这里是 `.contact-section, .faq-section` 两条一起写的。
+   2026-10-14 联系方式那一块删掉之后，.contact-section 已经没有
+   对应的节点了 —— 只留 .faq-section，免得下一个看样式的人
+   去找一个不存在的容器。 */
+.faq-section {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  padding: 30rpx;
+  font-size: 28rpx;
+  color: #666;
+  border-bottom: 1rpx solid #eee;
+}
+
+/* .contact-list / .contact-item / .contact-info / .contact-label /
+   .contact-value 五组样式随联系方式一起删了（同上）。
+   注意 wxss 是【按页面隔离】的：pages/suggest 里也有个
+   .contact-section，和这里不是一个东西，别去找那边。 */

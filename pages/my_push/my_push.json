@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-empty": "@vant/weapp/empty/index"
+  },
+  "navigationBarTitleText": "我发布的",
+  "enablePullDownRefresh": true,
+  "navigationBarBackgroundColor": "#FF9500",
+  "navigationBarTextStyle": "white"
+}

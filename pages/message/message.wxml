@@ -1,0 +1,107 @@
+<!-- 顶部分段。两段的区别和为什么不分页，见 message.js 顶部说明。 -->
+<view class="segment">
+  <view
+    class="segment-item {{tab === 'chat' ? 'active' : ''}}"
+    data-tab="chat"
+    bindtap="onSwitchTab"
+  >
+    聊天
+  </view>
+  <view
+    class="segment-item {{tab === 'notice' ? 'active' : ''}}"
+    data-tab="notice"
+    bindtap="onSwitchTab"
+  >
+    通知
+    <!-- 未读小圆点。用圆点不用数字：通知的「条数」对用户没什么用，
+         他关心的是「有没有新东西」。数字反而会和聊天列表里
+         那些未读数字混在一起，看着像同一套东西。 -->
+    <view class="segment-dot" wx:if="{{noticeUnread > 0}}"></view>
+  </view>
+</view>
+
+<!-- ⚠️ 下面 conv-list 的 wx:if 和 notice-list 的 wx:else 是一整条链。
+     两条分支【之间】不允许夹注释、也不留空行 ——
+     注释在 WXML 里是编译期移除的，有些基础库版本会把链断掉，
+     断了不报错，是「聊天」和「通知」两段同时显示出来。
+
+     所以关于这两段该写的都写在这儿：
+       聊天段 → 会话列表，点进去是一段可以继续的对话
+       通知段 → 站内通知，点进去是订单列表，读完就完了
+     为什么不把它们混成一个列表，见 message.js 顶部说明。 -->
+<view class="conv-list" wx:if="{{tab === 'chat'}}">
+  <view
+    class="conv-item"
+    wx:for="{{list}}"
+    wx:key="id"
+    bindtap="onOpenChat"
+    data-id="{{item.id}}"
+  >
+    <view class="avatar-wrap">
+      <!-- 对方没设头像（peerAvatar 为空）时兜底显示默认头像。
+           用的是本地的 /images/default-avatar.png，【不是】外链占位图 ——
+           外链等于把别人的图片服务器挂在小程序里，对方挂了或者被墙了，
+           这里就是一片破图，而且不报错、不提示，最难查。 -->
+      <image class="avatar" src="{{item.peerAvatar || defaultAvatar}}" mode="aspectFill"></image>
+      <view wx:if="{{item.unread > 0}}" class="badge">{{item.badge}}</view>
+    </view>
+
+    <view class="conv-body">
+      <view class="conv-top">
+        <text class="peer-name">{{item.peerName}}</text>
+        <text class="conv-time">{{item.timeText}}</text>
+      </view>
+
+      <view class="conv-preview">{{item.preview}}</view>
+
+      <!-- 聊的是哪件商品。同一件商品的会话只有一个，所以这行
+           同时也是「这次对话的主题」，比只显示人名有用得多 -->
+      <view class="conv-goods">
+        <text class="goods-price">¥{{item.goodsPrice}}</text>
+        <text class="goods-title">{{item.goodsTitle}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-block" wx:if="{{!chatLoading && list.length === 0}}">
+    <van-empty description="{{emptyText}}" />
+    <view class="empty-btn" bindtap="onGoHome">去逛逛</view>
+  </view>
+</view>
+
+<view class="notice-list" wx:else>
+  <view
+    class="notice-item {{item.read ? 'is-read' : ''}}"
+    wx:for="{{notices}}"
+    wx:key="id"
+    data-index="{{index}}"
+    bindtap="onOpenNotice"
+  >
+    <!-- 未读圆点。放在整条的最左边，扫一眼就能看出哪几条是新的 -->
+    <view class="notice-dot {{item.read ? 'hidden' : ''}}"></view>
+
+    <view class="notice-icon">
+      <van-icon name="{{item.icon}}" size="40rpx" color="#FF9500" />
+    </view>
+
+    <view class="notice-body">
+      <view class="notice-top">
+        <text class="notice-title">{{item.title}}</text>
+        <text class="notice-time">{{item.timeText}}</text>
+      </view>
+      <view class="notice-text">{{item.body}}</view>
+    </view>
+
+    <!-- 删除。放在最右边，用 catchtap 拦住冒泡 ——
+         不拦的话点删除会同时触发整条的 onOpenNotice，
+         用户点「删除」却跳到了订单列表。 -->
+    <view class="notice-remove" data-index="{{index}}" catchtap="onRemoveNotice">
+      <van-icon name="cross" size="32rpx" color="#ccc" />
+    </view>
+  </view>
+
+  <view class="empty-block" wx:if="{{!noticeLoading && notices.length === 0}}">
+    <van-empty description="还没有通知" />
+    <view class="empty-btn" bindtap="onGoHome">去逛逛</view>
+  </view>
+</view>

@@ -1,0 +1,81 @@
+/* pages/privacy/privacy.wxss */
+
+/* ⚠️ 不要用 .container 当根类名 —— app.wxss 里有个同名类带着
+   display:flex / align-items:center / padding:200rpx 0，
+   会把整页挤成居中一列。这个坑 delivery.wxss 和 settings.wxss 都踩过。 */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.page {
+  padding: 20rpx 20rpx 60rpx;
+}
+
+/* 开头那段概述。用浅橙底把它和下面的卡片分开 ——
+   它是「一分钟读完」的版本，下面的卡片是细节，两者的读者不是同一批。 */
+.summary {
+  background-color: #FFF3E0;
+  color: #8a5a00;
+  font-size: 26rpx;
+  line-height: 1.8;
+  padding: 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.item {
+  margin-bottom: 24rpx;
+}
+
+/* 最后一项不要再留一段空白 */
+.item:last-child {
+  margin-bottom: 0;
+}
+
+.item-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.item-body {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* 分行的条目。见 privacy.wxml 里的说明 ——
+   WXML 不支持 {&#39;\n&#39;}，换行只能靠拆节点。 */
+.line {
+  line-height: 1.8;
+}
+
+/* 需要用户看清楚的词。只加粗不变色，避免整页花掉 */
+.em {
+  font-weight: 600;
+  color: #333;
+}
+
+.footnote {
+  text-align: center;
+  font-size: 22rpx;
+  color: #bbb;
+  padding: 20rpx 40rpx 0;
+  line-height: 1.6;
+}

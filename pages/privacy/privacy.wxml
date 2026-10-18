@@ -1,0 +1,218 @@
+<!-- pages/privacy/privacy.wxml -->
+<view class="page">
+
+  <view class="summary">
+    {{brand.APP_NAME}}（校园二手交易）是一个校内闲置交易平台。这份说明写清楚我们
+    <text class="em">收集什么</text>、<text class="em">拿来做什么</text>、
+    <text class="em">存在哪里</text>，以及你可以怎么处理。
+    最后更新：{{updatedAt}}
+  </view>
+
+  <!-- ============ 收集哪些信息 ============ -->
+  <view class="card">
+    <view class="card-title">一、我们收集哪些信息</view>
+
+    <view class="item">
+      <view class="item-title">你主动填写的资料</view>
+      <view class="item-body">
+        真实姓名、昵称、学号、宿舍、手机号、微信号、头像。这些<text class="em">全部由你自己在「注册」和「编辑资料」里填写</text>，
+        我们不会读取你的微信头像和微信昵称。
+      </view>
+    </view>
+
+    <!-- 真实姓名这一条是后补的：它是 2026-10 新增的注册必填项，
+         在那之前政策里没有它 —— 不补上就是漏报。
+         可见范围必须在这儿写死一句，因为这是用户填真名时最大的顾虑。 -->
+    <view class="item">
+      <view class="item-title">真实姓名（仅管理员可见）</view>
+      <view class="item-body">
+        注册时需要填写真实姓名，用于确认你是本校在校学生。
+        它<text class="em">不会出现在商品页、聊天或订单里的任何位置</text>，
+        其他用户看到的始终是你的昵称。只有你本人和小程序管理员可以看到，
+        存于云数据库的 users 记录中。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">你发布的商品</view>
+      <view class="item-body">
+        商品图片、标题、描述、售价、分类、交易地点。这些内容会对其他用户公开 ——
+        这正是交易能达成的前提。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">交易与沟通记录</view>
+      <view class="item-body">
+        订单信息（下单、确认、取消、配送）、站内聊天记录、收货地址。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">大致位置（仅注册时一次）</view>
+      <view class="item-body">
+        注册时会申请一次<text class="em">模糊位置</text>权限，只用来判断你是不是在校内，
+        <text class="em">不记录精确坐标、不持续定位、不后台定位</text>。
+        拒绝授权只会导致无法完成校内身份确认，不影响你浏览商品。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">相册 / 相机（仅在你选图时）</view>
+      <view class="item-body">
+        换头像、发布商品、和卖家聊天时发图片、给意见反馈附图时，会打开系统相册或相机让你选图。
+        只有你选中的那张图会被上传，我们不会扫描你的相册。
+      </view>
+    </view>
+
+    <!-- 这一条是意见反馈功能从「开发中」变成真的之后补的。
+         在它还是空壳的时候，反馈页什么都没存，政策里不提它是对的；
+         现在它真的会存文字、截图和联系方式，不写就是漏报。
+         上限（3 张 / 500 字）写在正文里，所以
+         utils/cloud-config.js 里那两条注释把这里也列进了「要一起改的地方」。 -->
+    <view class="item">
+      <view class="item-title">你提交的意见反馈</view>
+      <view class="item-body">
+        你在「意见反馈」里写的文字（最多 500 字）、选填的联系方式，
+        以及你自愿附上的截图（最多 3 张）。这些内容<text class="em">不会对任何人公开</text>，
+        只用于我们了解和处理你提出的问题。截图会先经过微信官方内容安全接口检测，
+        检测不通过的会被立即删除。
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 不做的事 ============ -->
+  <view class="card">
+    <view class="card-title">二、我们不会做的事</view>
+    <view class="item-body">
+      <!-- ⚠️ 这里原来写成 {&#39;\n&#39;} 想在 WXML 里换行 —— 那是 Vue 的写法，
+           WXML 不认，会原样渲染出「{'\n'}」这几个字符。
+           WXML 里换行只能靠【真的分成多个节点】，或者给容器加
+           white-space: pre-wrap 再在源码里换行。这里用前者，最稳。 -->
+      <view class="line">· 不读取你的微信昵称和微信头像；</view>
+      <view class="line">· 不获取你微信绑定的手机号；</view>
+      <view class="line">· 不收集你的通讯录、短信、通话记录；</view>
+      <view class="line">· 不记录精确 GPS 坐标，不做后台定位；</view>
+      <view class="line">· 不把你的个人信息卖给或提供给任何第三方用于广告。</view>
+    </view>
+  </view>
+
+  <!-- ============ 存哪、存多久 ============ -->
+  <view class="card">
+    <view class="card-title">三、信息存在哪里</view>
+    <view class="item-body">
+      全部数据存放在<text class="em">微信云开发（腾讯云）</text>上，位于中国大陆境内。
+      图片存在云存储，其余信息存在云数据库。
+      删除商品、删除收货地址后，对应数据会从数据库中移除；
+      订单和聊天记录因为涉及双方，会在你删除后继续保留一段时间作为交易凭证。
+    </view>
+  </view>
+
+  <!-- ============ 谁看得到 ============ -->
+  <view class="card">
+    <view class="card-title">四、谁能看到你的信息</view>
+
+    <view class="item">
+      <view class="item-title">所有用户都能看到</view>
+      <view class="item-body">
+        你发布的商品、商品上的交易地点、你的昵称和头像。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">只有交易对方能看到</view>
+      <view class="item-body">
+        下单后，卖家能看到收货人的姓名、电话、详细地址；
+        卖家确认订单后填的取货电话，只有接单的配送员能看到。
+        <text class="em">配送大厅里对所有配送员展示的待接单，不包含任何手机号和详细地址</text>，
+        只有接单之后才会显示。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">你愿意才会公开的</view>
+      <view class="item-body">
+        手机号和微信号默认不对外展示，只有在你自己填了、并且进入交易流程后才会被对方看到。
+      </view>
+    </view>
+
+    <view class="item">
+      <view class="item-title">只有管理员和你自己能看到</view>
+      <view class="item-body">
+        你填写的<text class="em">真实姓名</text>，以及你提交的意见反馈内容。
+        真实姓名只在云数据库里保存，不随商品、聊天、订单对外传递 ——
+        你可以在「编辑资料」里随时修改它。
+      </view>
+    </view>
+
+    <!-- 反馈是唯一一块「用户以为只有自己和管理员能看到」的数据，
+         必须明确写出来。用户提交 bug 截图时往往会带上学号、聊天记录、
+         订单信息这些东西 —— 他有权知道这些东西去哪了。
+         另一头：反馈只有提交者本人和管理员看得到，
+         「我的反馈」列表靠服务端按 openid 过滤，别人查不到。 -->
+    <view class="item">
+      <view class="item-title">只有小程序管理员能看到</view>
+      <view class="item-body">
+        你提交的意见反馈（文字、截图、联系方式）。
+        <text class="em">其他用户看不到你的反馈，也无法查看你提交过什么</text>；
+        你自己的「我的反馈记录」里只能看到你自己提交的内容。
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 你的权利 ============ -->
+  <view class="card">
+    <view class="card-title">五、你可以怎么做</view>
+    <view class="item-body">
+      <view class="line">· 在「我的 → 编辑资料」里修改或清空你填写的任何资料；</view>
+      <view class="line">· 在「我的 → 我发布的」里下架或删除商品；</view>
+      <view class="line">· 在「我的 → 地址管理」里删除收货地址；</view>
+      <view class="line">· 在「我的 → 意见反馈 → 我的反馈记录」里查看自己提交过的反馈和处理进度；</view>
+      <!-- 搜索历史只存在本机、从来没上传过，所以它【不进】上面
+           「我们收集哪些信息」那一节 —— 那一节的标题是「收集」，
+           写进去等于承认我们收走了它，反而成了不实陈述。
+           但用户有权知道自己在手机里留了什么、怎么删，
+           所以放在这一节（你可以怎么做）里。 -->
+      <view class="line">· 在搜索页点「清空」删掉本机保存的搜索历史（这份历史只存在你手机上）；</view>
+      <view class="line">· 在微信「发现 → 小程序 → 长按本小程序 → 删除」里清除本地数据；</view>
+      <view class="line">· 在微信「设置 → 隐私 → 授权管理」里撤回位置等系统权限。</view>
+    </view>
+  </view>
+
+  <!-- ============ 第三方 ============ -->
+  <view class="card">
+    <view class="card-title">六、第三方</view>
+    <view class="item-body">
+      本小程序使用微信云开发提供后端服务，使用 Vant Weapp 组件库（随小程序一起打包，
+      运行时不发起任何外部请求）。除微信官方的内容安全检测接口外，
+      我们不会把你的内容发送给任何其他第三方。
+    </view>
+  </view>
+
+  <!-- ============ 联系 ============ -->
+  <view class="card">
+    <view class="card-title">七、联系我们</view>
+    <view class="item-body">
+      对这份说明有疑问，或想查询、更正、删除你的信息，
+      可以通过「我的 → 联系客服」或「我的 → 意见反馈」联系我们。
+    </view>
+    <!-- 【2026-10-16 补的这一段】
+         微信后台那份《用户隐私保护指引》第 4 节承诺的联系方式就是下面这个邮箱。
+         审核会拿两份对：「指引里写的联系方式，在小程序里找不到」是一条很常见的
+         驳回理由 —— 而在这之前，邮箱只存在于客服页那一行小字里，
+         从隐私说明这个入口进来的人根本看不到。
+
+         ⚠️ 值来自 utils/cloud-config.js 的 SERVICE_EMAIL，不要在 wxml 里写死。
+            那个常量同时被客服页和后台指引用着，写死就是三处各存一份。
+         wx:if 是必要的，不是保险 —— SERVICE_EMAIL 可以被改成空串。 -->
+    <view class="item-body" wx:if="{{contactEmail}}">
+      也可以发邮件到 <text class="em">{{contactEmail}}</text>，
+      或在「我的 → 联系客服」页点一下复制这个地址。
+    </view>
+  </view>
+
+  <view class="footnote">
+    继续使用本小程序，即表示你已阅读并同意以上说明。
+  </view>
+
+</view>

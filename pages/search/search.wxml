@@ -1,0 +1,110 @@
+<!--pages/search/search.wxml-->
+
+<!-- ⚠️ 下面那组 wx:if / wx:elif / wx:else 之间【不允许夹注释】。
+     注释在 WXML 里是编译期移除的，有些基础库版本移得掉、
+     有些版本会把分支链断掉 —— 断了不报错，整页什么都不渲染，
+     没有任何线索。所以这一段里一条注释都不放，要写的都写在这儿：
+
+       !searched                  → 引导态：还没搜过
+       loading && 列表为空         → 搜索中
+       搜完了但列表为空            → 没有找到
+       其余                       → 结果列表
+
+     「还没搜过」和「搜了没结果」必须分开：共用一个「暂无商品」，
+     用户会以为搜索坏了。 -->
+
+<!-- 搜索框放在结果页顶部，而不是让用户退回首页重打。
+     搜完想换个词是最常见的动作，退回去再进来要多两步。
+     用 sticky 吸顶：翻到第 5 页想改词时不用一路滚回顶部。 -->
+<view class="search-bar">
+  <van-search
+    value="{{inputValue}}"
+    placeholder="搜索你想要的宝贝"
+    shape="round"
+    background="#FF9500"
+    bind:search="onSearch"
+    bind:clear="onClear"
+    bind:focus="onSearchFocus"
+    bind:blur="onSearchBlur"
+    bind:click-input="onSearchFocus"
+  />
+</view>
+
+<!-- 搜索历史面板：点一下搜索框就滑出来，盖在结果上面，一直留着，
+     直到「收起」或「重新搜索」为止。
+
+     【为什么是盖住，不是把结果挤下去】
+       这一层高度是 0、面板绝对定位，完全不占文档流 ——
+       结果还在原来的位置，只是被遮罩压暗了。
+       挤下去的话，面板一开一合页面高度会跳、滚动位置跟着乱，
+       而用户按下搜索键的频率远高于看历史。
+
+     【z-index 的排布是这个组件能不能用的关键】
+       遮罩 1 < 面板 2 < 本层 90 < 搜索框 100
+       搜索框始终露在最上面、始终能点 —— 否则面板一弹出来
+       就把搜索框盖住了，用户改不了关键词也关不掉它。
+
+     【什么时候消失】
+       点遮罩、点历史标签、按下搜索。三条路都在 search.js 里。 -->
+<view class="history-layer" wx:if="{{historyVisible && history.length > 0}}">
+  <view class="history-panel">
+    <view class="history-head">
+      <text class="history-title">搜索历史</text>
+      <text class="history-clear" bindtap="onClearHistory">清空</text>
+    </view>
+
+    <view class="history-tags">
+      <view
+        class="history-tag"
+        wx:for="{{history}}"
+        wx:key="*this"
+        data-kw="{{item}}"
+        bindtap="onHistoryTap"
+      >
+        <text class="history-tag-text">{{item}}</text>
+        <!-- 删除用 catchtap：外面的标签是 bindtap 的，
+             不拦住冒泡就会「删掉一条、又立刻搜一次」 -->
+        <text class="history-tag-x" data-kw="{{item}}" catchtap="onRemoveHistory">×</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 遮罩铺满整屏，点它收起面板 -->
+  <view class="history-mask" bindtap="onHideHistory"></view>
+</view>
+
+<view class="guide" wx:if="{{!searched}}">
+  <van-icon name="search" size="90rpx" color="#ddd" />
+  <view class="guide-text">输入关键词，找找同学在卖什么</view>
+</view>
+<view class="loading-tip" wx:elif="{{loading && goodsList.length === 0}}">搜索中...</view>
+<van-empty wx:elif="{{goodsList.length === 0}}" description="没有找到相关商品" />
+<view class="goods-container" wx:else>
+  <view class="result-count">找到 {{goodsList.length}} 件商品</view>
+
+  <!-- 卡片内部结构见 components/goods-card，这里只负责传数据。
+       商品 ID 由组件的 cardtap 事件回传（页面里读 e.detail.id），
+       不再靠 data-id 传 —— 原因见组件 index.js 顶部说明。
+
+       highlight 是搜索页独有的：关键词高亮的分段在第 40 行左右
+       由 splitByKeyword 算好，只有【标题里】命中才有；
+       命中来自描述时为 null，组件会自动退回整条渲染。 -->
+  <view class="goods-list">
+    <goods-card
+      wx:for="{{goodsList}}"
+      wx:key="id"
+      goods-id="{{item.id}}"
+      image="{{item.image}}"
+      title="{{item.title}}"
+      price="{{item.price}}"
+      views="{{item.views}}"
+      campus="{{item.campus}}"
+      avatar="{{item.publisher.avatar}}"
+      nickname="{{item.publisher.nickname}}"
+      highlight="{{item.hl}}"
+      bind:cardtap="onGoodsTap"
+    />
+  </view>
+
+  <view class="list-end" wx:if="{{isEnd}}">没有更多了</view>
+</view>

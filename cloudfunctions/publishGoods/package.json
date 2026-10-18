@@ -1,0 +1,9 @@
+{
+  "name": "publishGoods",
+  "version": "1.0.0",
+  "description": "发布商品云函数：参数校验 + 内容安全检测 + 写入数据库",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,636 @@
+/* pages/detail/detail.wxss */
+page {
+  background-color: #f5f5f5;
+  /* 给底部固定操作栏让位，否则最后一块内容会被永久挡住。
+     原来这条 padding 挂在 .container 上，但 detail.wxml 里根本没有
+     .container 这个元素 —— 是条死样式，白留了。
+
+     110rpx 是操作栏，多留的 60rpx 是给上面的「开发模式」提示条。
+     正常模式下那 60rpx 就是页面底部的空白，看不出来；
+     与其为了一条开发期提示条去搞动态高度，不如一直留着。 */
+  padding-bottom: calc(170rpx + env(safe-area-inset-bottom));
+}
+
+/* 开发模式提示条：浮在操作栏正上方 */
+.dev-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(110rpx + env(safe-area-inset-bottom));
+  z-index: 100;
+  padding: 10rpx 24rpx;
+  background: #FFF3E0;
+  border-top: 1rpx solid #FFE0B2;
+  color: #FF9500;
+  font-size: 22rpx;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* 图片轮播 */
+.image-section {
+  position: relative;
+}
+
+.image-swiper {
+  height: 750rpx;
+}
+
+.goods-image {
+  width: 100%;
+  height: 100%;
+}
+
+.image-indicator {
+  position: absolute;
+  bottom: 20rpx;
+  right: 20rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+/* 价格信息 */
+.price-section {
+  background-color: #fff;
+  padding: 30rpx;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 16rpx;
+}
+
+.current-price {
+  font-size: 48rpx;
+  color: #FF9500;
+  font-weight: bold;
+}
+
+/* .original-price 随「原价」一起删了。
+   不清掉它不会报错，但下次改这个页面的人会先去找「哪个元素用了它」，
+   找完发现没有 —— 死代码的成本在这儿，不在体积。 */
+
+.stats-row {
+  display: flex;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.stats-row text {
+  margin-right: 30rpx;
+}
+
+/* 商品标题 */
+.title-section {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-top: 20rpx;
+}
+
+.goods-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+  line-height: 1.5;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+/* 标题下面那三个小标签：分类 / 交易地点 / 数量。
+   ⚠️ .tags / .tag-campus / .tag-category 这三个类名是原来就有的，
+      但 wxml 里一直没有对应的元素 —— 是一段「有样式没结构」的死代码，
+      而且那两条规则是照 van-tag 写的（border-color + !important）。
+      现在真用上了，改成纯文字的胶囊标签：文字标签不需要加组件，
+      少一个依赖就少一处「升级 vant 之后变样」的风险。 */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tag-category,
+.tag-campus,
+.tag-quantity {
+  font-size: 22rpx;
+  line-height: 1;
+  padding: 10rpx 18rpx;
+  border-radius: 6rpx;
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.tag-category {
+  color: #1989fa;
+  background-color: rgba(25, 137, 250, 0.1);
+}
+
+.tag-campus {
+  color: #07c160;
+  background-color: rgba(7, 193, 96, 0.1);
+}
+
+/* 商品描述 */
+.desc-section {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-top: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.goods-desc {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  display: block;
+}
+
+.publish-time {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+/* 卖家信息 */
+.seller-section {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.seller-info {
+  display: flex;
+  align-items: center;
+}
+
+.seller-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+}
+
+/* 原来这里有一条 .seller-avatar-empty（灰底 + 居中，配 van-icon 用的）。
+   未设头像时改成显示默认头像图片之后，这个 class 在 WXML 里已经不存在了，
+   留着就是永远不会生效的死代码。 */
+
+.seller-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.seller-name {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 8rpx;
+}
+
+.seller-stats {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.seller-stats text {
+  margin-right: 20rpx;
+}
+
+/* 温馨提示 */
+.tips-section {
+  background-color: #fff;
+  padding: 20rpx 30rpx 30rpx;
+  margin-top: 20rpx;
+}
+
+.tips-content {
+  padding: 0 20rpx;
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.tip-item:last-child {
+  margin-bottom: 0;
+}
+
+.tip-item text {
+  margin-left: 16rpx;
+}
+
+/* ===== 底部操作栏 ===== */
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  /* ⚠️ 这里【不要】写 justify-content: space-between。
+     试过了，那样会把「收藏 / 客服」均匀撒到左半屏上 —— 而这两个是要
+     【挨在一起】的（收藏在左、客服紧挨在它右边）。
+     保持默认的 flex-start，剩余空间交给 .action-buttons 吃掉，
+     结果就是：左边两个图标贴紧靠左，右边两个按钮贴紧靠右，中间一段空白。 */
+  height: 110rpx;
+  padding: 0 24rpx;
+  /* 全面屏底部小黑条。content-box 让这段安全距离【加在】110rpx 之外，
+     否则会被算进高度里，把按钮挤扁 */
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: content-box;
+  background: #fff;
+  border-top: 1rpx solid #eee;
+}
+
+.action-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 110rpx;
+  /* ⚠️ flex 三条要【分开写】，别写 flex: none 这种简写。
+     简写在这里压不住原生 <button>：实测（两次截图逐像素量过）
+     加了 flex: none 之后，客服按钮还是 356rpx，和加之前只差 1rpx。
+
+     不加会怎样：flex 行里的原生 <button> 会自己长开。
+     同一个 width，旁边的 <view> 兄弟规规矩矩 110rpx，它却是 356rpx ——
+     356 正好是「110 + 剩余空间的一半」，也就是它拿走了 flex-grow。
+     多出来的 246rpx 全从右边按钮栏抢，「聊一聊」被压成一个字并把
+     第二行折到屏幕外，「立即购买」直接顶出屏幕右边缘。
+
+     三条一起钉死：不伸（grow 0）、不缩（shrink 0）、基准 110rpx；
+     再配一条 max-width —— 万一这里的 width 又被什么顶掉，
+     max-width 还按得住。 */
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 110rpx;
+  max-width: 110rpx;
+}
+
+.action-icon-text {
+  font-size: 22rpx;
+  color: #666;
+  margin-top: 4rpx;
+}
+
+.action-icon-text.active {
+  color: #FF9500;
+}
+
+/* 客服按钮。
+   它本质上就是第二个 .action-icon —— WXML 里两个 class 是一起写的，
+   布局（110rpx 宽、图标在上文字在下的竖排）整个复用，这里只补
+   <button> 这个原生组件特有的复位。
+
+   ⚠️ ::after 那条不能省。button 的默认边框画在 ::after 伪元素上，
+      不是 border 属性，所以只写 border: none 去不掉 ——
+      少了它，一个本该纯图标的按钮外面会镶一圈灰线。
+      pages/concat 的原生客服按钮踩过同一个坑，那边注释写得更细。 */
+.service-btn {
+  /* 视觉顺序：排到「收藏」【右边】。
+     WXML 里这个按钮是 .action-bar 的第一个子元素（它必须待在
+     wx:if / wx:else 分支链【外面】，两个分支都得有它），
+     但位置上要在收藏右边，所以只能用 order 把顺序调过来：
+     收藏是默认的 0，这里 1，.action-buttons 是 2。
+     ⚠️ 代价是【视觉顺序和 DOM 顺序不一致】—— 触摸屏没有键盘焦点，
+        唯一的实际影响是读屏软件按 DOM 顺序念。知道就行。 */
+  order: 1;
+
+  /* ⚠️ 尺寸要在这里【再写一遍】，不能只靠上面 .action-icon 那份。
+     原生 <button> 从共用类里接住 flex 尺寸并不可靠 —— 实测就是它没接住，
+     同一个 .action-icon 规则，<view> 那边生效、<button> 这边不生效。
+     这个类只作用在这一个元素上，重复一遍没有代价，但少一遍就白改。 */
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 110rpx;
+  width: 110rpx;
+  max-width: 110rpx;
+
+  /* ⚠️ margin 必须重置。button 的默认样式里有 margin-left / margin-right: auto，
+     那是为了让它单独出现时能居中。但 .action-bar 是 flex 行，
+     而 flex 布局里 auto margin 会【先于】flex-grow 吃掉空余空间 ——
+     结果就是「客服」被从左边推开一段，中间还多出一道缝。
+     光看代码很难联想到是 margin 的问题，所以这条留着。 */
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  line-height: 1;
+  border: none;
+}
+
+.service-btn::after {
+  border: none;
+}
+
+/* 按下时的反馈。原生 button 按下默认是灰底，而旁边那个收藏图标没有底色，
+   两个挨着的按钮按下时表现不一样会显得突兀 —— 这里给一档很浅的灰。 */
+.service-btn.button-hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.action-buttons {
+  /* 吃掉全部剩余空间。左边两个图标因此能贴紧在左，
+     右边的按钮则被推到最右，中间那段空白就是这里撑出来的。
+     两个分支都靠它：买家这一支里面是两个按钮，
+     自己的商品那一支里面是「管理我发布的商品」（.btn-owner 再 flex:1 铺满）。 */
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+
+  /* 视觉顺序：排在客服【右边】。
+     DOM 里它在客服前面（见 wxml 里的说明），
+     值只要比 .service-btn 的 order: 1 大就行。 */
+  order: 2;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  padding: 0 40rpx;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+  text-align: center;
+  /* 按钮上的字永远不许折行。折行的后果不是「难看」，是「看不懂」：
+     这排按钮只有 72rpx 高、还贴着屏幕底边固定，文字一折，第二行就落到
+     屏幕外面 —— 屏幕上只剩开头一个字，「立即购买」看起来就是「立」，
+     活像按钮坏了。（上面那条 flex 的坑就是这么被发现的。）
+
+     nowrap 还顺带把 flex 的自动最小宽度顶成了整条文案的宽度：
+     将来文案变长、真的放不下时，表现是横向溢出（一眼看得见），
+     而不是竖着折走（看不出来）。 */
+  white-space: nowrap;
+}
+
+.btn-contact {
+  background: #FFF3E0;
+  color: #FF9500;
+  margin-right: 16rpx;
+}
+
+.btn-buy {
+  background: linear-gradient(90deg, #FF9500, #FF6B00);
+  color: #fff;
+}
+
+.btn-disabled {
+  background: #ccc;
+  color: #fff;
+}
+
+.btn-owner {
+  flex: 1;
+  background: linear-gradient(90deg, #FF9500, #FF6B00);
+  color: #fff;
+}
+
+/* ============================================================
+   下单弹层
+   ============================================================
+   这些样式写在页面里（不是组件里），但作用在 van-popup 里的内容上 ——
+   能生效的原因是：写在 <van-popup> 标签【中间】的那些节点，
+   在 WXML 里属于【页面的】模板树，不是组件内部的模板。
+   所以页面的样式管得着它们。（组件自己的样式才受隔离限制。）
+
+   位置：> 弹层撑到 82vh 就不再长，滚动交给 .sheet-body，
+   底部按钮钉住不动。地址列表一长，按钮滚出屏幕就没人找得到它。 */
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: 82vh;
+}
+
+.sheet-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.sheet-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.sheet-body {
+  flex: 1;
+  /* min-height:0 是 flex 布局里滚动容器的老规矩：
+     滚动容器的默认 min-height 是 auto，内容再长它也不肯缩，
+     flex:1 会因此失效 —— 整个弹层被内容撑开、页面反而不滚了。 */
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10rpx 30rpx 30rpx;
+}
+
+.sheet-label {
+  font-size: 26rpx;
+  color: #999;
+  padding: 26rpx 0 16rpx;
+}
+
+.sheet-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label-add {
+  color: #FF9500;
+  font-size: 26rpx;
+  padding: 0 10rpx;
+}
+
+/* ---------- 取货方式 ---------- */
+
+.type-item {
+  display: flex;
+  align-items: center;
+  padding: 26rpx 24rpx;
+  border: 2rpx solid #eee;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.type-item.active {
+  border-color: #FF9500;
+  background: #FFF9F0;
+}
+
+.type-text {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.type-name {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.type-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 6rpx;
+}
+
+/* ---------- 收货地址 ---------- */
+
+.addr-state {
+  padding: 40rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.addr-add-btn {
+  margin: 24rpx auto 0;
+  width: 280rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  border-radius: 36rpx;
+  background: #FF9500;
+  color: #fff;
+  font-size: 28rpx;
+}
+
+.addr-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border: 2rpx solid #eee;
+  border-radius: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.addr-item.active {
+  border-color: #FF9500;
+  background: #FFF9F0;
+}
+
+.addr-body {
+  flex: 1;
+  /* flex 子项默认 min-width:auto，内容长了不肯缩会把整行撑破 */
+  min-width: 0;
+}
+
+.addr-line1 {
+  display: flex;
+  align-items: center;
+}
+
+.addr-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  margin-right: 16rpx;
+}
+
+.addr-phone {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.addr-tag {
+  margin-left: 14rpx;
+  padding: 0 10rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  font-size: 20rpx;
+  color: #FF9500;
+  background: #FFF3E0;
+  border-radius: 6rpx;
+}
+
+.addr-line2 {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 配送费说明 ---------- */
+
+.fee-box {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+}
+
+.fee-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fee-label {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.fee-value {
+  font-size: 28rpx;
+  color: #FF9500;
+  font-weight: bold;
+}
+
+.fee-note {
+  margin-top: 14rpx;
+  font-size: 22rpx;
+  color: #999;
+  line-height: 1.6;
+}
+
+/* ---------- 底部按钮 ---------- */
+
+/* 这里【故意不写】env(safe-area-inset-bottom)：
+   van-popup 的 safeAreaInsetBottom 默认就是 true，它自己会给
+   弹层补上安全区的 padding。这里再加一次就是双重留白，
+   全面屏手机上底部会空出好大一截。 */
+.sheet-footer {
+  flex-shrink: 0;
+  padding: 20rpx 30rpx 30rpx;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.sheet-btn {
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  color: #fff;
+  background: linear-gradient(90deg, #FF9500, #FF6B00);
+}
+
+.sheet-btn.disabled {
+  background: #ccc;
+}

@@ -1,0 +1,74 @@
+<view class="search-box">
+  <van-search value="{{ searchValue }}" placeholder="搜索你想要的宝贝" shape="round" background="#FF9500" bind:search="onSearch" />
+</view>
+
+<!-- 轮播图
+     这里【不用 image】—— 内容是样式画出来的（渐变底 + 两行字）。
+     原来三张是 unsplash 的外链，真机上全是白框，原因见 home.js 里 bannerList 的注释。
+     换成图片时记得回 <image src="{{item.image}}">，且 src 必须是云存储 fileID。 -->
+<view class="banner-box">
+  <swiper class="banner-swiper" indicator-dots autoplay circular interval="3000">
+    <swiper-item wx:for="{{bannerList}}" wx:key="id">
+      <view class="banner-slide banner-slide-{{item.theme}}">
+        <view class="banner-title">{{item.title}}</view>
+        <view class="banner-desc">{{item.desc}}</view>
+      </view>
+    </swiper-item>
+  </swiper>
+</view>
+
+<!-- 分类金刚区 -->
+<view class="category-box">
+  <view class="category-grid">
+    <view class="category-item" wx:for="{{categoryList}}" wx:key="id" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="onCategoryTap">
+      <view class="category-icon">
+        <van-icon name="{{item.icon}}" size="48rpx" color="#FF9500" />
+      </view>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 闲置物品列表 -->
+<view class="goods-section">
+  <view class="section-header">
+    <text class="section-title">闲置物品</text>
+  </view>
+  <view class="goods-list">
+    <!-- 卡片内部结构见 components/goods-card，这里只负责传数据。
+         商品 ID 由组件的 cardtap 事件回传（页面里读 e.detail.id），
+         不再靠 data-id 传 —— 原因见组件 index.js 顶部说明 -->
+    <goods-card
+      wx:for="{{goodsList}}"
+      wx:key="id"
+      goods-id="{{item.id}}"
+      image="{{item.image}}"
+      title="{{item.title}}"
+      price="{{item.price}}"
+      views="{{item.views}}"
+      campus="{{item.campus}}"
+      avatar="{{item.publisher.avatar}}"
+      nickname="{{item.publisher.nickname}}"
+      bind:cardtap="onGoodsTap"
+    />
+  </view>
+
+  <!-- 空状态。
+       ⚠️ 它【不在】上面的 .goods-list 里面，这是有意的。
+          .goods-list 是两列网格（flex 换行 + 两端对齐，见 home.wxss），
+          空状态一旦放进去就成了它的一个 flex 子项：宽度先被缩成
+          插画那么宽（约 232px），再被 space-between 当成「只有一项」
+          摆到最左边。之前插画和文案都偏在左侧就是这个原因 ——
+          不是间距没调好，是它压根站错了容器。
+
+       判断条件里的 !loading 和 isEnd 都【不能省】，否则会在首屏闪一下：
+         · 刚进页面时 goodsList 是空的、数据还在路上 → 会先闪出
+           「还没有商品」，然后商品才顶上来；
+         · 加载失败时也只是 loading 变回 false，isEnd 仍停在 false，
+           所以这块空状态不会出现 —— 那时正确的反馈是那句
+           「加载失败，请下拉重试」的 toast，而不是「一件商品都没有」。
+       两个条件加上之后，只有「查询成功、且确实一条都没有」才显示。 -->
+  <view class="empty-wrap" wx:if="{{!loading && isEnd && goodsList.length === 0}}">
+    <van-empty description="还没有在售的商品" />
+  </view>
+</view>

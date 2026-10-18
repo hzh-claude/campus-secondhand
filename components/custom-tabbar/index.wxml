@@ -1,0 +1,5 @@
+<van-tabbar active="{{ active }}" active-color="#FF9500" inactive-color="#999999" bind:change="onChange">
+  <van-tabbar-item icon="home-o">首页</van-tabbar-item>
+  <van-tabbar-item icon="add-o">发布</van-tabbar-item>
+  <van-tabbar-item icon="user-o">我的</van-tabbar-item>
+</van-tabbar>

@@ -1,0 +1,81 @@
+<!-- 开启「新订单通知」。
+     放在最上面：「我卖出的」是卖家唯一会主动来看订单的地方，
+     第一次进来就该看到这个入口 —— 而不是等他白白错过几单之后
+     才发现原来有通知功能。
+
+     必须做成按钮（用户点击触发）：微信规定订阅消息只能在
+     用户点击的上下文里请求，页面自动弹是被禁止的。
+     详见 utils/subscribe.js 里的说明。
+
+     2026-10-14 两处改动：
+       1. 删掉了「微信限制：每开启一次，可接收 1 条通知」这行说明 ——
+          不用「微信限制」这种话术打扰用户。
+       2. 加了 wx:if：开过一次就【不再显示】这条横条，
+          别天天杵在页面顶上。
+     注意 1 删掉了不等于事实变了：一次授权仍然只有 1 条额度。
+     续期入口在「设置」页，那里一直在。 -->
+<view class="notice-bar" wx:if="{{!subscribed}}">
+  <view class="notice-info">
+    <view class="notice-title">有人下单时通知我</view>
+  </view>
+  <view class="notice-btn" bindtap="onSubscribe">开启</view>
+</view>
+
+<!-- 待确认订单：需要我行动的，放最上面 -->
+<view class="section" wx:if="{{orderList.length > 0}}">
+  <view class="section-title">
+    <text class="badge"></text>
+    待你确认的订单（{{orderList.length}}）
+  </view>
+
+  <view class="goods-item" wx:for="{{orderList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.goodsId}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <!-- 配送标记：让卖家在点「确认卖出」之前就知道这单要走配送，
+           而不是点下去突然冒出个「留个取货电话」的输入框被问懵。
+           提前一句「校内配送」，那个输入框就从「为什么问我要电话」
+           变成了「哦，配送员要来找我」。 -->
+      <view class="goods-desc buyer">
+        买家：{{item.buyerName}}
+        <text class="delivery-tag" wx:if="{{item.isDelivery}}">校内配送</text>
+      </view>
+      <view class="goods-desc">下单于{{item.time}}</view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="status pending">{{item.statusText}}</view>
+      </view>
+    </view>
+    <!-- catchtap：阻止冒泡，否则点按钮会同时触发卡片的跳转 -->
+    <view class="goods-actions">
+      <view class="action-btn confirm-btn" catchtap="onConfirmTap" data-id="{{item.id}}">确认卖出</view>
+      <view class="action-btn reject-btn" catchtap="onRejectTap" data-id="{{item.id}}">拒绝</view>
+    </view>
+  </view>
+</view>
+
+<!-- 已卖出：归档，只读 -->
+<view class="section">
+  <view class="section-title" wx:if="{{orderList.length > 0}}">已卖出</view>
+
+  <view class="goods-item" wx:for="{{soldList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.id}}">
+    <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+    <view class="goods-info">
+      <view class="goods-title">{{item.title}}</view>
+      <view class="goods-desc">
+        {{item.campus}} · 成交于{{item.soldTime}}<block wx:if="{{item.buyerName}}"> · 卖给 {{item.buyerName}}</block>
+      </view>
+      <view class="goods-footer">
+        <view class="price">¥{{item.price}}</view>
+        <view class="status sold">已卖出</view>
+      </view>
+    </view>
+    <view class="goods-actions">
+      <!-- 有买家昵称 = 存在 completed 订单，云函数 undoSold 也会拒。
+           只给「快捷卖出、点错了」留按钮。 -->
+      <view class="action-btn undo-btn" wx:if="{{!item.buyerName}}" catchtap="onUndoSoldTap" data-id="{{item.id}}">撤销卖出</view>
+    </view>
+  </view>
+
+  <van-empty wx:if="{{soldList.length === 0 && orderList.length === 0}}" description="暂无卖出记录" />
+</view>

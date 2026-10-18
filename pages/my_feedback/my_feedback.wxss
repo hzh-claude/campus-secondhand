@@ -1,0 +1,105 @@
+/* pages/my_feedback/my_feedback.wxss */
+/* 卡片布局沿用「我买到的」那一套（白卡 + 12rpx 圆角 + 20rpx 间距），
+   同一类东西在不同页面长得一样，用户不用重新认一遍。 */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.feedback-item {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.type-tag {
+  font-size: 24rpx;
+  color: #666;
+  background-color: #f5f5f5;
+  padding: 4rpx 16rpx;
+  border-radius: 4rpx;
+}
+
+.status-tag {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+/* 处理中：橙色。和「待卖家确认」同一套语义色 —— 事情还没落定，用户在等 */
+.status-tag.pending {
+  background-color: #FFF3E0;
+  color: #FF9500;
+}
+
+/* 已处理：绿色 */
+.status-tag.done {
+  background-color: #07c160;
+  color: #fff;
+}
+
+.item-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  /* 用户输入里的换行要保留。用户分点写的反馈合并成一段会很难读。 */
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.image-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.thumb {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  background-color: #f0f0f0;
+}
+
+/* 管理员回复。
+   左侧竖线 + 浅灰底，视觉上明确是【别人说的话】，
+   和上面的正文（用户自己写的）区分开。
+   这是唯一能把处理结论传回给用户的渠道，不能长得像一句普通说明。 */
+.reply-box {
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  background-color: #f7f8fa;
+  border-left: 6rpx solid #FF9500;
+  border-radius: 0 8rpx 8rpx 0;
+}
+
+.reply-label {
+  font-size: 22rpx;
+  color: #FF9500;
+  margin-bottom: 8rpx;
+}
+
+.reply-text {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.6;
+  /* 同 item-content：管理员在控制台填的回复里很可能有换行 */
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.item-time {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 16rpx;
+}

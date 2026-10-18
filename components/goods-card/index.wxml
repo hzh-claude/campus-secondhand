@@ -1,0 +1,51 @@
+<!--components/goods-card/index.wxml-->
+
+<!-- ⚠️ 下面 title 的 wx:if / wx:else 是一对分支，中间【不允许夹注释】。
+     注释在 WXML 里是编译期移除的，有些基础库版本移得掉、有些版本会把
+     分支链断掉 —— 断了不报错，整条标题什么都不渲染。要写的都写在这儿：
+
+       有 highlight（搜索页命中关键词）→ 切成三段，命中那段加高亮底
+       没有 highlight（首页 / 分类页）  → 整条渲染
+
+     WXML 里没法调 JS 函数，切片只能在页面里算好再传进来。 -->
+
+<view class="goods-item" bindtap="onCardTap">
+  <image class="goods-image" src="{{image}}" mode="aspectFill"></image>
+
+  <view class="goods-info">
+    <text class="goods-title" wx:if="{{highlight}}">{{highlight.before}}<text class="hl">{{highlight.match}}</text>{{highlight.after}}</text>
+    <text class="goods-title" wx:else>{{title}}</text>
+
+    <view class="goods-price-row">
+      <!-- 用 priceText 而不是 price：库里可能存着 1e25 这种历史脏数据，
+           直接渲染会变成「¥1e+25」。格式化在组件 index.js 里做，
+           三个用到这个卡片的页面自动一起正确。 -->
+      <text class="goods-price">¥{{priceText}}</text>
+      <text class="goods-views">{{views}}人浏览</text>
+    </view>
+
+    <view class="goods-footer {{hidePublisher ? 'footer-solo' : ''}}">
+      <!-- hidePublisher：只有卖家主页会传 true（那是页面上唯一一个
+           每张卡都同一个人的地方）。其它页面不传，走默认 false，
+           渲染结果和以前一模一样。
+
+           加 footer-solo 是因为这一行是 justify-content: space-between：
+           只剩「交易地点」一个孩子时，它会跑到最左边 —— 和别的页面
+           （地点在右下角）看着不是同一个卡片。footer-solo 把它推回右边。 -->
+      <view class="publisher-info" wx:if="{{!hidePublisher}}">
+        <!-- 没设头像（avatar 为空字符串）时兜底成默认头像。
+             这里用 `||` 而不是 wx:if / wx:else 两个分支，有两个好处：
+               ① 少一对分支，就少一处「分支链被注释打断」的风险；
+               ② 顺带把「空头像」在全项目统一成同一张图 ——
+                  以前首页是灰色小人图标，而「我的」页面是另一张图。 -->
+        <image class="publisher-avatar" src="{{avatar || defaultAvatar}}" mode="aspectFill"></image>
+        <text class="publisher-nickname">{{nickname}}</text>
+      </view>
+
+      <view class="goods-campus">
+        <van-icon name="location-o" size="20rpx" />
+        {{campus}}
+      </view>
+    </view>
+  </view>
+</view>

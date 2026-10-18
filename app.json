@@ -1,0 +1,63 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/push/push",
+    "pages/user/user",
+    "pages/type_list/type_list",
+    "pages/detail/detail",
+    "pages/edit/edit",
+    "pages/my_push/my_push",
+    "pages/my_sold/my_sold",
+    "pages/my_favorite/my_favorite",
+    "pages/my_buy/my_buy",
+    "pages/address/address",
+    "pages/address_edit/address_edit",
+    "pages/concat/concat",
+    "pages/suggest/suggest",
+    "pages/my_feedback/my_feedback",
+    "pages/about/about",
+    "pages/register/register",
+    "pages/message/message",
+    "pages/chat/chat",
+    "pages/search/search",
+    "pages/delivery/delivery",
+    "pages/settings/settings",
+    "pages/privacy/privacy",
+    "pages/seller/seller"
+  ],
+  "requiredPrivateInfos": ["getFuzzyLocation"],
+  "permission": {
+    "scope.userFuzzyLocation": {
+      "desc": "用于确认你所在位置是否在校内，仅在你注册时获取一次"
+    }
+  },
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "物校角",
+    "navigationBarBackgroundColor": "#ffffff"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#999999",
+    "selectedColor": "#FF9500",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/push/push",
+        "text": "发布"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

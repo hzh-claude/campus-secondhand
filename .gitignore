@@ -1,0 +1,23 @@
+# 依赖
+node_modules/
+cloudfunctions/**/node_modules/
+
+# 微信开发者工具的个人配置
+# 含本机编译条件、调试选项，每个人都不一样，不该进仓库
+project.private.config.json
+
+# 开发期产物
+sourcemap.zip
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 本地环境变量（如果你以后用 .env 存配置）
+.env
+.env.local
+
+# 说明：miniprogram_npm/ 是【故意提交】的。
+# 它由 npm install + 开发者工具「构建 npm」生成，
+# 提交它是为了让 clone 下来的人直接能编译，不必先装 Node 环境。

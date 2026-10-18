@@ -1,0 +1,236 @@
+/* pages/chat/chat.wxss */
+
+page {
+  height: 100%;
+  background: #f5f6f8;
+}
+
+/* 三段竖排。overflow:hidden 是给中间那段兜底的 ——
+   没有它，消息长了整页会被顶开，输入框跑到屏幕外。 */
+.chat-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- 顶部商品条 ---------- */
+
+.goods-bar {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+  /* flex-shrink:0 —— 不许被中间的消息区挤扁 */
+  flex-shrink: 0;
+}
+
+.goods-thumb {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+  background: #f2f2f2;
+  flex-shrink: 0;
+}
+
+.goods-thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goods-meta {
+  flex: 1;
+  min-width: 0;
+  margin: 0 16rpx;
+}
+
+.goods-title {
+  font-size: 26rpx;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-price {
+  margin-top: 6rpx;
+  font-size: 26rpx;
+  color: #FF9500;
+  font-weight: 600;
+}
+
+/* ---------- 消息区 ---------- */
+
+.msg-scroll {
+  flex: 1;
+  /* min-height:0 是 flex 布局里的一个坑：
+     滚动容器的默认 min-height 是 auto，内容再长它也不肯缩，
+     结果就是 flex:1 失效、整个 scroll-view 被撑开、页面不滚动。
+     没有这一行，下面所有布局都是白写的。 */
+  min-height: 0;
+}
+
+.msg-list {
+  padding: 24rpx 24rpx 12rpx;
+}
+
+.msg-hint {
+  text-align: center;
+  color: #bbb;
+  font-size: 24rpx;
+  padding: 40rpx 0;
+}
+
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 28rpx;
+}
+
+/* 自己的消息整行反向 —— 气泡自然就靠右了，
+   不用给每个元素单独写 float / margin-left:auto */
+.msg-row.mine {
+  flex-direction: row-reverse;
+}
+
+.msg-avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 10rpx;
+  background: #f2f2f2;
+  flex-shrink: 0;
+}
+
+/* 原来这里有一条 .msg-avatar-empty（居中，配 van-icon 用的）。
+   未设头像时改成显示默认头像图片之后，这个 class 在 WXML 里已经不存在了。 */
+
+.bubble-wrap {
+  max-width: 70%;
+  margin: 0 16rpx;
+  display: flex;
+  flex-direction: column;
+  /* 【必须显式写】列方向的 flex 容器默认 align-items: stretch，
+     会把每个子项横向拉满整个容器宽度。
+
+     2026-10-14 之前一直没出问题，是因为下面那行时间只有「14:30」
+     五个字符，永远比气泡窄 —— 但它一旦变成「2025-09-27 14:30」，
+     容器宽度就被时间文字撑开了，短气泡（比如对方发一句「在吗」）
+     会被跟着拉宽，变成「文字靠左、右边空一大块」。
+     写 flex-start 让气泡永远按自己的内容宽度走。
+
+     注意这是【布局默认值导致的静默错误】：不报错、不警告，
+     只是看着有点怪。和 components/goods-card 那个 :host 是同一类。 */
+  align-items: flex-start;
+}
+
+/* 自己的消息整列靠右，时间也跟着靠右，不用单独给时间写对齐 */
+.msg-row.mine .bubble-wrap {
+  align-items: flex-end;
+}
+
+/* 图片气泡。
+   ⚠️ 这里【不加】 .bubble 的 padding 和圆角背景 ——
+   图片自己就是内容，再套一层白底内边距会变成
+   「一张图外面镶一圈白框」。
+   只给圆角裁切。
+
+   max-width: 100% 而不是固定宽度：外面 .bubble-wrap 已经是 70% 宽，
+   小图不该被拉大。配 mode="widthFix"（见 chat.wxml），
+   宽度取原图、高度自动 —— 所以不变形，也不会像 aspectFill 那样裁掉内容。
+   display:block 是为了去掉 image 默认的 inline 基线空隙 ——
+   不设的话图片底下会多出几像素空白，有图的气泡会比文字气泡高一截。 */
+.bubble-image {
+  max-width: 100%;
+  border-radius: 12rpx;
+  display: block;
+}
+
+.bubble {
+  padding: 18rpx 24rpx;
+  border-radius: 12rpx;
+  font-size: 29rpx;
+  line-height: 1.5;
+  /* 长单词/长链接不换行会把气泡撑出屏幕，这三个属性一起才管用 */
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+/* 对方：白底黑字，左上角收一个小角，指向头像 */
+.msg-row.theirs .bubble {
+  background: #fff;
+  color: #333;
+  border-top-left-radius: 4rpx;
+}
+
+/* 自己：主题色底白字，右上角收角 */
+.msg-row.mine .bubble {
+  background: #FF9500;
+  color: #fff;
+  border-top-right-radius: 4rpx;
+}
+
+.msg-time {
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #bbb;
+}
+
+/* ---------- 输入条 ---------- */
+
+.input-bar {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  /* 全面屏底部有那条横杠，padding 不加上去输入框会被压在横杠下面，
+     而且只有部分机型会出问题 —— 最容易被漏掉的一种适配 */
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #f0f0f0;
+  flex-shrink: 0;
+}
+
+/* 发图片的加号按钮。
+   不用原生 button：原生 button 自带背景、边框和 ::after，
+   复位它要写四五行，而这里只需要一个「点一下」的热区。 */
+.image-btn {
+  width: 76rpx;
+  height: 76rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+
+.input {
+  flex: 1;
+  height: 76rpx;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+  background: #f5f6f8;
+  border-radius: 38rpx;
+  font-size: 29rpx;
+  color: #333;
+}
+
+.input-placeholder {
+  color: #bbb;
+}
+
+.send-btn {
+  margin-left: 20rpx;
+  padding: 0 34rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  border-radius: 38rpx;
+  font-size: 29rpx;
+  color: #fff;
+  background: #ddd;
+  flex-shrink: 0;
+}
+
+.send-btn.active {
+  background: #FF9500;
+}

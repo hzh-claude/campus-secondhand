@@ -1,0 +1,78 @@
+<!-- pages/settings/settings.wxml -->
+
+<!-- ============ 通知 ============
+     这两项原来是散落在「我卖出的」和「我买到的」两个列表页顶部的横条。
+     放在那儿是对的（用户在那一页才想得起「我要这通知」），
+     但额度用完想再开一次时，他得先想起来去哪个页面找。
+     设置页这一份是【续期入口】——同一个 requestSubscribe，
+     换了个随时找得到的地方。
+
+     2026-10-14 两处改动：
+       1. 两处横条改成「开过一次就收起」（见 my_sold / my_buy 的 wxml）。
+       2. 删掉了「微信限制：每开启一次，只能收到 1 条通知…」那行说明。
+     这两条改动合起来意味着：横条收起之后，【这一页就是唯一的入口】了。
+     所以这里【不能】再藏起来 —— 它是用户额度用完时唯一的救命通道。
+     这也是「删掉说明」和「删掉入口」的区别：说明是打扰，入口是必需品。 -->
+<view class="group">
+  <view class="group-title">通知</view>
+  <van-cell-group>
+    <van-cell
+      title="新订单通知"
+      label="有人买你的东西时提醒你"
+      is-link
+      bind:click="onSubscribeNewOrder"
+    >
+      <van-icon slot="icon" name="bell" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+    </van-cell>
+    <van-cell
+      title="订单状态通知"
+      label="你买的东西有结果时提醒你"
+      is-link
+      bind:click="onSubscribeOrderStatus"
+    >
+      <van-icon slot="icon" name="volume-o" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+    </van-cell>
+  </van-cell-group>
+</view>
+
+<!-- ============ 通用 ============ -->
+<view class="group">
+  <view class="group-title">通用</view>
+  <van-cell-group>
+    <van-cell
+      title="清除缓存"
+      value="{{cacheSize}}"
+      is-link
+      bind:click="onClearCache"
+    >
+      <van-icon slot="icon" name="delete-o" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+    </van-cell>
+    <van-cell
+      title="检查更新"
+      value="{{updateState === 'latest' ? '已是最新' : (updateState === 'ready' ? '有新版本' : '')}}"
+      is-link
+      bind:click="onCheckUpdate"
+    >
+      <van-icon slot="icon" name="replay" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+    </van-cell>
+  </van-cell-group>
+</view>
+
+<!-- ============ 关于 ============
+     这一组【故意】只有隐私政策一项。
+     「意见反馈」和「关于我们」已经在「我的 → 工具箱」里了，
+     搬过来一份就是同一件事两个入口 —— 而这一页存在的全部理由，
+     就是消掉「设置和编辑是同一个页面」那种重复。
+     所以宁可这一组看着单薄，也不再把它们复制一遍。 -->
+<view class="group">
+  <view class="group-title">关于</view>
+  <van-cell-group>
+    <van-cell title="隐私政策" is-link bind:click="onOpenPrivacy">
+      <van-icon slot="icon" name="shield-o" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+    </van-cell>
+  </van-cell-group>
+</view>
+
+<view class="footnote">
+  {{brand.APP_NAME}} · 校园二手交易
+</view>

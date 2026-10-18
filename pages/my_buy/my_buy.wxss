@@ -1,0 +1,160 @@
+/* pages/my_buy/my_buy.wxss */
+/* 布局与「我卖出的」「我的收藏」保持一致，只有状态标签的颜色不同 */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 开启通知的横条。样式和「我卖出的」那边保持一致 ——
+   同一类东西在不同页面长得一样，用户才不用重新认一遍。 */
+.notice-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #FFF3E0;
+  margin: 20rpx 20rpx 0;
+  padding: 24rpx;
+  border-radius: 12rpx;
+}
+
+.notice-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.notice-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.notice-sub {
+  font-size: 22rpx;
+  color: #E67700;
+  margin-top: 6rpx;
+}
+
+.notice-btn {
+  flex-shrink: 0;
+  padding: 14rpx 36rpx;
+  background-color: #FF9500;
+  color: #fff;
+  font-size: 26rpx;
+  border-radius: 32rpx;
+}
+
+.goods-list {
+  padding: 20rpx;
+}
+
+.goods-item {
+  display: flex;
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.goods-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+  background-color: #f0f0f0;
+}
+
+.goods-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.goods-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.goods-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+/* 关闭原因：用橙色，和普通灰色说明文字区分开 */
+.goods-desc.reason {
+  color: #FF9500;
+}
+
+/* 配送费。用配送蓝，和「我卖出的」那个「校内配送」标签同一套语义色 ——
+   一眼能认出「这一单走的是配送，不走自提」。
+   比普通说明文字重半档：它是收货那天要掏的钱，不是背景信息。 */
+.goods-desc.delivery-line {
+  color: #1989fa;
+}
+
+.goods-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10rpx;
+}
+
+.price {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FF9500;
+}
+
+.status {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+/* 待确认：橙色，提醒用户这笔还没落定 */
+.status.pending {
+  background-color: #FFF3E0;
+  color: #FF9500;
+}
+
+/* 已完成：绿色 */
+.status.completed {
+  background-color: #07c160;
+  color: #fff;
+}
+
+/* 已关闭：灰色，视觉上降权 */
+.status.cancelled {
+  background-color: #eee;
+  color: #999;
+}
+
+.goods-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15rpx;
+  margin-left: 15rpx;
+}
+
+.action-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cancel-btn {
+  background-color: #fff;
+  color: #999;
+  border: 1rpx solid #ddd;
+}

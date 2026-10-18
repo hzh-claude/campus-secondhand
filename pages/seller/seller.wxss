@@ -1,0 +1,113 @@
+/* pages/seller/seller.wxss */
+
+/* ⚠️ 不要用 .container 当根类名 —— app.wxss 里有个同名类带着
+   display:flex / align-items:center / padding:200rpx 0，
+   会把整页挤成居中一列。delivery / settings / privacy 都踩过这个坑。 */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* ============ 页头 ============ */
+.seller-header {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.seller-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 60rpx;
+  margin-right: 28rpx;
+  /* 图片没加载出来时给个浅底，避免一块纯白 */
+  background-color: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.seller-meta {
+  flex: 1;
+  /* 名字太长时不要把它顶出去 */
+  min-width: 0;
+}
+
+.seller-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 14rpx;
+  /* 昵称可能很长，超一行截断加省略号。
+     不截断的话会把页头撑高，而这一页的主角是下面的商品 */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.seller-stats {
+  display: flex;
+  align-items: center;
+}
+
+.stat {
+  font-size: 26rpx;
+  color: #999;
+  margin-right: 32rpx;
+}
+
+/* 数字比标签重一档，一眼能扫到 */
+.stat-num {
+  color: #FF9500;
+  font-weight: 600;
+}
+
+/* ============ 列表标题 ============ */
+.list-header {
+  padding: 0 30rpx 20rpx;
+}
+
+.list-title {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* ============ 商品列表 ============
+   卡片本身的长相（背景、圆角、宽度、间距）都在
+   components/goods-card/index.wxss 里，首页 / 分类页 / 搜索页共用同一份，
+   这里【不要】再抄一遍 —— 页面里的同名类会盖住组件里的，
+   改组件样式改半天没反应，就是这个原因。
+
+   但【容器】这几行必须自己写，而且必须和 home.wxss 一模一样：
+   组件里的卡片宽度是 :host { width: calc(50% - 10rpx) }，
+   它要的是一个「flex 换行 + 两端对齐」的父容器。
+   少了 display:flex，那一行 width 就落不到实处 ——
+   组件自己的注释里记着这个坑（首页卡片塌成一条窄缝、图被挤成竖条），
+   症状是不报错、不警告，只是布局塌掉。
+   两列布局是【一对】配出来的，缺一个都不成立。 */
+.goods-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* ============ 状态 ============ */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 40rpx;
+}
+
+.empty-text {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.list-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #bbb;
+  padding: 30rpx 0 40rpx;
+}

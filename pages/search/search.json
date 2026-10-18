@@ -1,0 +1,13 @@
+{
+  "usingComponents": {
+    "van-search": "@vant/weapp/search/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-empty": "@vant/weapp/empty/index",
+    "goods-card": "/components/goods-card/index"
+  },
+  "navigationBarTitleText": "搜索",
+  "navigationBarBackgroundColor": "#FF9500",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

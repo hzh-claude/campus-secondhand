@@ -1,0 +1,10 @@
+{
+  "usingComponents": {
+    "van-empty": "@vant/weapp/empty/index"
+  },
+  "navigationBarTitleText": "我买到的",
+  "navigationBarBackgroundColor": "#FF9500",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

@@ -1,0 +1,16 @@
+{
+  "usingComponents": {
+    "van-search": "@vant/weapp/search/index",
+    "van-swipe": "@vant/weapp/swipe-cell/index",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-image": "@vant/weapp/image/index",
+    "van-grid": "@vant/weapp/grid/index",
+    "van-grid-item": "@vant/weapp/grid-item/index",
+    "goods-card": "/components/goods-card/index",
+    "van-empty": "@vant/weapp/empty/index"
+  },
+  "navigationBarTitleText": "物校角",
+  "enablePullDownRefresh": true,
+  "navigationBarBackgroundColor": "#FF9500",
+  "navigationBarTextStyle": "white"
+}

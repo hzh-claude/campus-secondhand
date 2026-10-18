@@ -1,0 +1,133 @@
+<!-- 头像 -->
+<view class="section">
+  <view class="avatar-section">
+    <!-- 没设头像时显示默认头像。
+         这里原来是一个灰色小人图标，和「我的」页面的默认头像不一致 ——
+         从「我的」点进来，头像会突然从默认图变成灰小人，看着像头像丢了。
+         两个页面必须是同一张图。
+         userInfo.avatar 保持空字符串，绝不填默认图，原因见
+         utils/cloud-config.js 里 DEFAULT_AVATAR 的说明 -->
+    <image class="avatar" src="{{userInfo.avatar || defaultAvatar}}" mode="aspectFill"></image>
+    <van-button type="default" size="small" bind:click="onChangeAvatar">更换头像</van-button>
+  </view>
+</view>
+
+<!-- 基本信息 -->
+<view class="section">
+  <view class="section-title">基本信息</view>
+  <van-cell-group>
+    <!-- bind:keyboardheightchange 挂在【每个可编辑字段】上 —— 键盘是谁唤起的
+         都无所谓，目的只是量出键盘高度，见 edit.js 的 onKeyboardHeightChange
+         和页面最底下那块占位。 -->
+    <van-field label="昵称" value="{{userInfo.nickname}}" placeholder="请输入昵称" border="{{false}}" maxlength="20" bind:change="onNicknameChange" bind:keyboardheightchange="onKeyboardHeightChange" />
+    <!-- ============ 学号和真实姓名：只展示，不能改 ============
+         这两个字段的写权限现在只剩注册页一处 —— 见
+         cloudfunctions/user/index.js 的 updateProfile 里
+         「学号与真实姓名：注册后锁死」那段。前端换成不可编辑的样子
+         只是【体验】，真正拦人的是云函数（直接 callFunction 一样改不动）。
+
+         为什么用 van-cell 而不是加 readonly 的 van-field：
+           readonly 的输入框长得和能改的【一模一样】，用户会一直去点它，
+           点不动还以为是卡了、以为是键盘没弹出来。
+           单元格的样子一眼就知道「这条只是给你看的」。
+
+         '未填写' 那个兜底是给老用户留的：他们的档案是 login 云函数建的，
+         里面这两个字段是空的。 -->
+    <van-cell title="真实姓名" value="{{userInfo.realName || '未填写'}}" />
+    <van-cell title="学号" value="{{userInfo.studentId || '未填写'}}" />
+    <van-cell title="宿舍" value="{{userInfo.campus || '请选择'}}" is-link bind:click="onSelectCampus" />
+  </van-cell-group>
+  <!-- maxlength="20" 是写死的：WXML 里读不到 require 进来的常量。
+       ⚠️ 必须和 utils/cloud-config.js 的 NICKNAME_MAX
+          以及 cloudfunctions/user/index.js 里的同名常量一致。 -->
+
+  <!-- 下面这一行是一句【对用户的承诺】，不是随手写的说明文字。
+       2026-10-15 逐处核对过，它现在是成立的：
+         · 云函数里三处给「交易的对方」造快照的白名单，功能上等价于
+           「谁能看到别人」，全都只取 nickname + avatar，显式排除了 realName：
+             cloudfunctions/order/index.js       getUserBrief
+             cloudfunctions/publishGoods/index.js buildPublisher
+             cloudfunctions/chat/index.js        profileOf
+           （搜 realName 就能找到这三处，每处都有同样的警告注释。）
+         · 配送员在订单里看到的是【收货地址快照】里的收货人姓名，
+           那是买家自己填的地址姓名，不是注册时那个 realName。
+         · App 里没有任何页面把 realName 显示给别人 ——
+           edit / user 两处显示的是「我自己的」档案。
+
+       【2026-10-15 改写了一次，记一下为什么】
+       原来写的是「真实姓名只有管理员和你本人能看到；商品页展示的是昵称」。
+       两句话都真，但重点摆错了，而且多引出一个词：
+         · 用户在这个页面上真正担心的是「会不会被别的同学看到」——
+           因为商品页/订单/聊天确实在给陌生人看昵称和头像，两种东西
+           就摆在同一个 App 里。这句才是要说给他听的。
+         · 「管理员」对用户是个【模糊的词】。他不知道管理员是谁，
+           看到它反而会多想一层「还有别人能看我的真名？」——
+           为一个他本来没有的疑问，凭空造了个担心的入口。
+       所以改成只说他担心的那一半：展示的是昵称，不是真名。
+       后半句的可见范围（谁在后台能看）属于后台《用户隐私保护指引》
+       的地盘，那里说才作数，不必在页面上重复一遍。
+
+       ⚠️ 改这句话之前先改代码，或者先确认代码已经改了 ——
+          它是给用户的承诺，而承诺和实现对不上，比不说更糟。
+          （同类的坑见 utils/cloud-config.js 里 SERVICE_EMAIL 那段：
+            隐私指引里承诺的邮箱，App 里必须真找得到。） -->
+  <view class="field-tip">商品页和订单里展示的是你的昵称，不会展示真实姓名。</view>
+  <view class="field-tip">学号和真实姓名注册后不能修改，如需修改请联系客服（我的 → 联系客服）。</view>
+</view>
+
+<!-- 校内身份。
+     整块等档案回来才渲染（verified !== null）——
+     否则已核验的人会先看到一瞬间的「未核验」+ 去核验按钮。 -->
+<view class="section" wx:if="{{verified !== null}}">
+  <view class="section-title">校内身份</view>
+  <van-cell-group>
+    <van-cell title="核验状态" value="{{verified ? '已核验' : '未核验'}}" />
+  </van-cell-group>
+  <!-- 未核验时给一条去注册页的路。
+       这里【只显示状态、不提供核验入口】—— 定位核验只在注册页做一次，
+       见 data 里 verified 的说明。 -->
+  <block wx:if="{{!verified}}">
+    <view class="field-tip">完成学号和位置核验后，才能发布和购买闲置物品。</view>
+    <view class="verify-action">
+      <van-button type="warning" size="small" color="#FF9500" bind:click="onGoRegister">去完成核验</van-button>
+    </view>
+  </block>
+</view>
+
+<!-- 联系方式 -->
+<view class="section">
+  <view class="section-title">联系方式</view>
+  <van-cell-group>
+    <van-field label="手机号" value="{{userInfo.phone}}" placeholder="请输入手机号" border="{{false}}" type="number" maxlength="11" bind:change="onPhoneChange" bind:keyboardheightchange="onKeyboardHeightChange" />
+    <van-field label="微信号" value="{{userInfo.wechat}}" placeholder="请输入微信号" border="{{false}}" bind:change="onWechatChange" bind:keyboardheightchange="onKeyboardHeightChange" />
+  </van-cell-group>
+</view>
+
+<!-- 保存按钮 -->
+<view class="save-section">
+  <van-button type="primary" color="#FF9500" block bind:click="onSave">保存修改</van-button>
+</view>
+
+<!-- ============ 键盘占位（高度 = 键盘高度，收起时为 0） ============
+     这一页的内容刚好塞满一屏，页面【没有可滚动的余量】。
+     van-field 的 adjust-position（默认开着）是靠【滚动页面】把输入框
+     顶到键盘上方的 —— 没余量可滚，它就什么也做不了，结果就是键盘
+     把「手机号」那一行整个盖住，填的时候看不见自己输的号码。
+
+     这里按键盘高度撑开同样一块空白：键盘弹起时页面多出刚好够用的
+     滚动余量，输入框能被顶到键盘正上方；键盘收起时高度归 0，
+     页面上不会多出一片留白。
+
+     ⚠️ 这块必须在【页面最后】—— 它靠的是「让内容比视口高」，
+        中间插进来等于把它后面的东西又推回键盘底下。 -->
+<view style="height: {{kbHeight}}px"></view>
+
+<!-- 宿舍选择弹窗 -->
+<van-popup show="{{showCampusPicker}}" position="bottom" bind:close="onCloseCampusPicker">
+  <van-picker
+    show-toolbar
+    columns="{{campusOptions}}"
+    bind:confirm="onConfirmCampus"
+    bind:cancel="onCloseCampusPicker"
+  />
+</van-popup>

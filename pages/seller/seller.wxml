@@ -1,0 +1,61 @@
+<!-- pages/seller/seller.wxml -->
+
+<!-- ============ 页头 ============ -->
+<view class="seller-header">
+  <!-- 空头像兜底成默认头像。用 `||` 而不是 wx:if / wx:else：
+       少一对分支就少一处「分支链被注释打断」的风险，
+       也把全项目的空头像统一成同一张图。 -->
+  <image class="seller-avatar" src="{{seller.avatar || defaultAvatar}}" mode="aspectFill"></image>
+
+  <view class="seller-meta">
+    <view class="seller-name">{{seller.nickname}}</view>
+    <view class="seller-stats">
+      <text class="stat">发布 <text class="stat-num">{{seller.publishCount}}</text></text>
+      <text class="stat">卖出 <text class="stat-num">{{seller.soldCount}}</text></text>
+    </view>
+  </view>
+</view>
+
+<!-- ============ 商品列表 ============ -->
+<view class="list-header">
+  <text class="list-title">TA 的在售商品</text>
+</view>
+
+<view class="goods-list">
+  <!-- 卡片内部结构见 components/goods-card。
+       商品 ID 由组件的 cardtap 事件回传（页面里读 e.detail.id），
+       不用 data-id 传 —— 原因见组件 index.js 顶部说明。
+
+       hide-publisher="true"：这一页每张卡都是同一个人，
+       头像昵称在页头已经大号显示过了，卡上再重复一遍是噪音。 -->
+  <goods-card
+    wx:for="{{goodsList}}"
+    wx:key="id"
+    goods-id="{{item.id}}"
+    image="{{item.image}}"
+    title="{{item.title}}"
+    price="{{item.price}}"
+    views="{{item.views}}"
+    campus="{{item.campus}}"
+    avatar="{{item.publisher.avatar}}"
+    nickname="{{item.publisher.nickname}}"
+    hide-publisher="{{true}}"
+    bind:cardtap="onGoodsTap"
+  />
+</view>
+
+<!-- 空状态：这个人一件在售的都没有。
+     ⚠️ 文案不能说「TA 什么都没卖过」—— 页头的「发布 N」可能不是 0，
+     人家卖完了、或者把东西下架了，都会走到这一屏。
+     说「暂时没有在售的」才是事实，也不至于让人以为走错了页面。 -->
+<view class="empty" wx:if="{{empty}}">
+  <van-icon name="search" size="120rpx" color="#ddd" />
+  <view class="empty-text">TA 暂时没有在售的商品</view>
+</view>
+
+<!-- 列表底部的加载提示。
+     ⚠️ 下面这两条 wx:if / wx:elif 是一整条链，中间【不允许夹注释】，
+     两行之间也【不留空行】—— 和 search.wxml 保持一致。
+     有的基础库版本会把链断掉，断了不报错，是两条提示可能同时冒出来。 -->
+<view class="list-tip" wx:if="{{loading && goodsList.length}}">加载中…</view>
+<view class="list-tip" wx:elif="{{isEnd && goodsList.length}}">没有更多了</view>

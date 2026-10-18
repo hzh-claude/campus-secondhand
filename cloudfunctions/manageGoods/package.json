@@ -1,0 +1,9 @@
+{
+  "name": "manageGoods",
+  "version": "1.0.0",
+  "description": "商品管理云函数：我的发布 / 浏览量 / 上下架 / 编辑 / 删除",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

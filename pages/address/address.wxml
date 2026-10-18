@@ -1,0 +1,37 @@
+<!-- 地址列表 -->
+<view class="address-list">
+  <view class="address-item" wx:for="{{addressList}}" wx:key="id">
+    <!-- 这一块【故意不挂 bindtap】。它原来挂着 onSelectAddress，
+         而那个函数体只有一行 console.log —— 整张卡片看着能点，
+         点下去毫无反应。理由见 address.js 里那段注释。 -->
+    <view class="address-content">
+      <view class="address-header">
+        <text class="name">{{item.name}}</text>
+        <text class="phone">{{item.phone}}</text>
+        <view class="default-tag" wx:if="{{item.isDefault}}">默认</view>
+      </view>
+      <view class="address-detail">{{item.campus}} {{item.detail}}</view>
+    </view>
+    <view class="address-actions">
+      <view class="action-item" catchtap="onEditAddress" data-id="{{item.id}}">
+        <van-icon name="edit" size="36rpx" color="#666" />
+        <text>编辑</text>
+      </view>
+      <view class="action-item" catchtap="onDeleteAddress" data-id="{{item.id}}">
+        <van-icon name="delete-o" size="36rpx" color="#666" />
+        <text>删除</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 空状态 -->
+<van-empty wx:if="{{addressList.length === 0}}" description="暂无收货地址" />
+
+<!-- 新增地址按钮 -->
+<view class="add-btn-wrapper">
+  <view class="add-btn" bindtap="onAddAddress">
+    <van-icon name="plus" size="32rpx" />
+    <text>新增收货地址</text>
+  </view>
+</view>

@@ -1,0 +1,125 @@
+<!-- pages/delivery/delivery.wxml -->
+
+<!-- 三种「不该看到列表」的状态，各自说实话。
+     混成一句「无权限」会让人对着一个其实没问题的白名单查半天 ——
+     「我没部署」和「我不是配送员」要修的是两件完全不同的事。
+
+     ⚠️ wx:if / wx:elif / wx:else 这条链中间【不能夹注释】，
+     某些基础库会把链断掉导致整页不渲染（pages/search/search.wxml 踩过这个坑）。 -->
+<view class="state-view" wx:if="{{!checked}}">
+  <view class="hint">正在确认身份...</view>
+</view>
+<view class="state-view" wx:elif="{{needDeploy}}">
+  <van-empty description="云端还没有这个功能" />
+  <view class="hint">线上 order 云函数是旧版本，请重新部署后再打开这一页。</view>
+</view>
+<view class="state-view" wx:elif="{{!isAdmin}}">
+  <van-empty description="你不是配送员" />
+  <view class="hint">如果这个账号应该能配送，把下面这串 openid 交给管理员加进白名单：</view>
+  <view class="openid" bindlongpress="onCopyOpenid">{{myOpenid}}</view>
+  <view class="hint-sub">长按复制</view>
+  <view class="diag">云函数 v{{cloudVersion}} · 白名单 {{adminCount < 0 ? '未知' : adminCount}} 人</view>
+</view>
+<block wx:else>
+
+  <!-- 收入条。服务端聚合好的（deliveryIncome），前端不做 reduce ——
+       列表只有 100 条上限，前端自己加会漏掉更早的单。 -->
+  <view class="income-bar">
+    <view class="income-main">
+      <view class="income-label">累计配送收入</view>
+      <view class="income-value">¥{{income.total}}</view>
+    </view>
+    <view class="income-count">共 {{income.count}} 单</view>
+  </view>
+
+  <van-tabs active="{{activeTab}}" color="#FF9500" bind:change="onTabChange">
+    <van-tab title="待接单({{poolList.length}})"></van-tab>
+    <van-tab title="配送中({{doingList.length}})"></van-tab>
+    <van-tab title="已送达({{doneList.length}})"></van-tab>
+  </van-tabs>
+
+  <!-- ============ 待接单 ============
+       这一屏【故意】不显示任何手机号 —— 云函数的 poolView 白名单
+       也没把这些字段发过来。池子是所有配送员共看的，接了单才该看见
+       卖家的取货电话和买家的收货信息。要加字段，去改 poolView。 -->
+  <view class="section" wx:if="{{activeTab === 0}}">
+    <view class="goods-item" wx:for="{{poolList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.goodsId}}">
+      <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="goods-info">
+        <view class="goods-title">{{item.title}}</view>
+        <view class="goods-desc">取货：{{item.pickupCampus}}</view>
+        <view class="goods-desc">送到：{{item.dropCampus}}</view>
+        <view class="goods-desc">卖家确认于{{item.time}}</view>
+        <view class="goods-footer">
+          <view class="price">配送费 ¥{{item.fee}}</view>
+          <view class="goods-price">商品 ¥{{item.price}}</view>
+        </view>
+      </view>
+      <!-- catchtap：阻止冒泡，否则点按钮会同时触发卡片的跳转 -->
+      <view class="goods-actions">
+        <view class="action-btn confirm-btn" catchtap="onAcceptTap" data-id="{{item.id}}">接单</view>
+      </view>
+    </view>
+
+    <van-empty wx:if="{{poolList.length === 0}}" description="暂时没有待接的单" />
+  </view>
+
+  <!-- ============ 配送中 ============ -->
+  <view class="section" wx:if="{{activeTab === 1}}">
+    <view class="goods-item" wx:for="{{doingList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.goodsId}}">
+      <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="goods-info">
+        <view class="goods-title">{{item.title}}</view>
+
+        <!-- 取货电话：卖家确认订单那一刻留的，写进了订单快照。
+             号码本身可点：这是配送员这一趟最常用的一个动作。 -->
+        <view class="goods-desc contact" wx:if="{{item.sellerPhone}}"
+              catchtap="onCallTap" data-phone="{{item.sellerPhone}}">
+          卖家 {{item.sellerPhone}}<text class="call-btn">拨打</text>
+        </view>
+        <view class="goods-desc">取货：{{item.pickupCampus}}</view>
+
+        <view class="goods-desc contact" wx:if="{{item.dropPhone}}"
+              catchtap="onCallTap" data-phone="{{item.dropPhone}}">
+          买家 {{item.dropName}} {{item.dropPhone}}<text class="call-btn">拨打</text>
+        </view>
+        <view class="goods-desc">送到：{{item.dropCampus}} {{item.dropDetail}}</view>
+
+        <view class="goods-footer">
+          <view class="price">配送费 ¥{{item.fee}}</view>
+          <view class="goods-price">商品 ¥{{item.price}}</view>
+        </view>
+      </view>
+      <view class="goods-actions">
+        <view class="action-btn confirm-btn" catchtap="onFinishTap" data-id="{{item.id}}">已送达</view>
+      </view>
+    </view>
+
+    <van-empty wx:if="{{doingList.length === 0}}" description="当前没有在送的单" />
+  </view>
+
+  <!-- ============ 已送达 ============
+       这一屏是【账本】。商品价格挂在配送费旁边不是为了好看 ——
+       它是「这笔账对不对」的核对：商品 ¥250 就该配 ¥2，
+       商品 ¥80 就该配 ¥1，对不上说明这单是旧规则下人工判过价的。
+       故意不显示「大件/小件」：那两个词现在指的是价格档，
+       和体积无关，摆在这里只会让人以为包裹很大。 -->
+  <view class="section" wx:if="{{activeTab === 2}}">
+    <view class="goods-item" wx:for="{{doneList}}" wx:key="id" bindtap="onGoodsTap" data-id="{{item.goodsId}}">
+      <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="goods-info">
+        <view class="goods-title">{{item.title}}</view>
+        <view class="goods-desc">取货：{{item.pickupCampus}}</view>
+        <view class="goods-desc">送到：{{item.dropCampus}} {{item.dropDetail}}</view>
+        <view class="goods-desc">送达于{{item.time}}</view>
+        <view class="goods-footer">
+          <view class="price">配送费 ¥{{item.fee}}</view>
+          <view class="goods-price">商品 ¥{{item.price}}</view>
+        </view>
+      </view>
+    </view>
+
+    <van-empty wx:if="{{doneList.length === 0}}" description="还没有送达的单" />
+  </view>
+
+</block>

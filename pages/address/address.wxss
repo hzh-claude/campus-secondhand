@@ -1,0 +1,98 @@
+/* pages/address/address.wxss */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 140rpx;
+}
+
+.address-list {
+  padding: 20rpx;
+}
+
+.address-item {
+  background-color: #fff;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.address-content {
+  padding: 30rpx;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-right: 20rpx;
+}
+
+.phone {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.default-tag {
+  font-size: 22rpx;
+  color: #FF9500;
+  border: 1rpx solid #FF9500;
+  border-radius: 4rpx;
+  padding: 2rpx 10rpx;
+  margin-left: 20rpx;
+}
+
+.address-detail {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.address-actions {
+  display: flex;
+  border-top: 1rpx solid #eee;
+  padding: 20rpx 0;
+}
+
+.action-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.action-item text {
+  margin-left: 8rpx;
+}
+
+.add-btn-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  background-color: #FF9500;
+  border-radius: 44rpx;
+  color: #fff;
+  font-size: 30rpx;
+}
+
+.add-btn text {
+  margin-left: 10rpx;
+}

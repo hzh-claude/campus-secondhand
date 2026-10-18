@@ -1,0 +1,85 @@
+<!-- 客服头像 -->
+<view class="header">
+  <!-- 原来这里是个 unsplash 外链。小程序引站外图要先配 downloadFile
+       合法域名，没配就渲染成白框；审核也会问「为什么要请求站外资源」。
+       全项目别的头像都用本地这张 default-avatar.png，这里跟齐。 -->
+  <image class="service-avatar" src="{{defaultAvatar}}" mode="aspectFill"></image>
+  <view class="service-name">在线客服</view>
+  <view class="service-desc">工作时间：9:00-21:00</view>
+
+  <!-- ============ 微信原生客服会话 ============
+       这是微信官方提供的客服入口：点一下直接进「客服小助手」的会话窗口，
+       消息进 mp 后台的客服系统，不经过本项目的云函数和数据库。
+
+       ⚠️ 这个按钮生效有一个【代码之外】的前提，在微信公众平台：
+         1. 功能 → 客服 → 开通客服功能
+         2. 绑定客服人员（客服的微信要能收到消息）
+       没做这两步的话，点下去【一点反应都没有】——
+       不报错、不弹窗、没有任何提示，最容易被认为是「按钮坏了」。
+
+       【联系方式这块的两次改动】
+         2026-10-14：删掉了原来「三条联系方式（电话/微信/邮箱）+ 兜底说明」
+           那一整块，产品要求。
+         2026-10-15：又把【邮箱】一种加回来，但不再恢复那个带图标的三条列表 ——
+           只在按钮下面加一行可点击复制的邮箱（见下面 .contact-email）。
+           原因两条，缺一不可：
+             a) 后台《用户隐私保护指引》第 4 节白纸黑字写了「可通过邮箱
+                联系开发者，行使查阅/复制/更正/删除/注销账号等权利」。
+                指引里承诺的入口，App 里必须真的找得到 —— 否则是指引
+                和实现对不上，审核和用户都会问「那个邮箱在哪」。
+             b) 上面那个前提（后台开通客服功能）没做的话按钮毫无反应，
+                页面需要一条不依赖后台配置的退路。邮箱就是这条退路：
+                它只依赖一个写死在代码里的常量，不受任何后台开关影响。
+
+       ⚠️ 【上线前仍然必须去后台确认客服功能已开通并绑定了客服人员】
+          邮箱是退路，不是「客服按钮可以不配了」的理由 —— 邮件回复慢，
+          小程序的即时沟通才是用户预期的那条路。
+
+       注释里保留上面那段前提说明是有意的：它不显示给用户看
+       （用户看到的是下面那行说明和按钮），但它是下一个维护者
+       排查「按钮点了没反应」时唯一能对上号的线索。
+
+       ⚠️ button 是原生组件，自带一套默认边框和背景，光靠 class 改不干净，
+       还要在 wxss 里用 .contact-btn::after { border: none } 把那条
+       1px 的默认边框去掉 —— 细节见 concat.wxss。 -->
+  <button class="contact-btn" open-type="contact" bindcontact="onContact">
+    <van-icon name="service-o" size="36rpx" color="#fff" custom-style="margin-right: 12rpx;" />
+    <text>在线客服</text>
+  </button>
+  <view class="contact-btn-note">点上面这个按钮，会打开微信的客服会话窗口</view>
+
+  <!-- ============ 兜底：客服邮箱 ============
+       为什么是「点此复制」而不是直接写个邮箱让人看：
+         邮箱是要粘到邮件 App 里用的，让人用手指去框选
+         那串「名字@域名」的字符，很容易少复制一个字母，
+         然后邮件发不出去 —— 而他不会觉得是自己复制错了，
+         只会觉得「客服给的邮箱是错的」。一键复制把这个出错空间消掉。
+
+       wx:if 是必要的，不是保险：SERVICE_EMAIL 是个可以改成 '' 的配置。
+       值只有一份，在 utils/cloud-config.js。改那里，这里跟着变。
+
+       ⚠️ 换这个邮箱的时候【两处一起换】：cloud-config 里那个常量，
+          加上微信后台《用户隐私保护指引》第 4 节的联系方式。
+          只换一处的话，App 里写的和指引里写的就不是同一个邮箱了。
+          另：必须是国内能正常打开的服务。填 gmail 的话用户点开是白屏。 -->
+  <view class="contact-email" wx:if="{{serviceEmail}}" bindtap="onCopyEmail">
+    <text class="contact-email-label">也可邮件联系我们（点此复制）：</text>
+    <text class="contact-email-value">{{serviceEmail}}</text>
+  </view>
+</view>
+
+<!-- 常见问题 -->
+<view class="faq-section">
+  <view class="section-title">常见问题</view>
+  <van-collapse value="{{activeNames}}" bind:change="onCollapseChange">
+    <van-collapse-item title="如何发布商品？" name="1">
+      点击底部"发布"按钮，填写商品信息（包括图片、标题、价格、描述等），选择分类和交易地点后即可发布。
+    </van-collapse-item>
+    <van-collapse-item title="如何保障交易安全？" name="2">
+      建议在校内公共场所进行面交，当面验货后再付款，避免私下转账。
+    </van-collapse-item>
+    <van-collapse-item title="如何修改/删除商品？" name="3">
+      进入"我的"-"我发布的"，找到对应商品点击编辑或下架即可。
+    </van-collapse-item>
+  </van-collapse>
+</view>

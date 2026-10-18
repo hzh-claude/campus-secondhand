@@ -1,0 +1,96 @@
+<!-- 用户信息卡片 -->
+<view class="user-card">
+  <view class="user-info">
+    <!-- 没设头像（avatar 为空）时兜底显示默认头像。
+         兜底【必须】写在这里（渲染时），不能写进 data ——
+         原因见 utils/cloud-config.js 里 DEFAULT_AVATAR 的说明 -->
+    <image class="avatar" src="{{userInfo.avatar || defaultAvatar}}" mode="aspectFill"></image>
+    <view class="info-content">
+      <view class="nickname">{{userInfo.nickname}}</view>
+      <view class="sub-info">
+        <van-icon name="location-o" size="24rpx" />
+        <text>{{userInfo.campus}}</text>
+      </view>
+      <view class="sub-info">
+        <van-icon name="idcard" size="24rpx" />
+        <text>{{userInfo.studentId}}</text>
+      </view>
+    </view>
+  </view>
+  <view class="edit-btn" bindtap="onEditProfile">
+    <van-icon name="edit" size="36rpx" color="#FF9500" />
+  </view>
+</view>
+
+<!-- 未核验提示条。
+     放在用户卡片正下方而不是顶部：用户点开「我的」第一眼要看的是自己是谁，
+     提示条插在最上面会把身份信息挤下去。
+     这里只是入口，门禁在云函数 —— 用户不点它、直接去发布页，
+     照样会在 push 页看到空状态页，服务端也照样会拒。 -->
+<view class="verify-banner" wx:if="{{verified === false}}" bindtap="onGoRegister">
+  <view class="verify-banner-text">
+    <view class="verify-banner-title">完成校内身份核验</view>
+    <view class="verify-banner-desc">核验后才能发布和购买闲置物品</view>
+  </view>
+  <van-icon name="arrow" size="32rpx" color="#FF9500" />
+</view>
+
+<!-- 统计数据 -->
+<view class="statistics-card">
+  <view class="stat-item" bindtap="onMenuTap" data-title="我发布的">
+    <view class="stat-value">{{statistics.published}}</view>
+    <view class="stat-label">发布</view>
+  </view>
+  <view class="stat-item" bindtap="onMenuTap" data-title="我卖出的">
+    <view class="stat-value">{{statistics.sold}}</view>
+    <view class="stat-label">卖出</view>
+  </view>
+  <view class="stat-item" bindtap="onMenuTap" data-title="我买到的">
+    <view class="stat-value">{{statistics.bought}}</view>
+    <view class="stat-label">买到</view>
+  </view>
+</view>
+
+<!-- 我的服务 -->
+<view class="menu-section">
+  <view class="section-title">我的服务</view>
+  <van-cell-group>
+    <van-cell wx:for="{{menuList}}" wx:key="id" title="{{item.title}}" is-link data-title="{{item.title}}" bind:click="onMenuTap">
+      <van-icon slot="icon" name="{{item.icon}}" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+      <!-- 未读条数。放在默认 slot 里 —— van-cell 的默认 slot 就是 value 区
+           （`<slot wx:else />`，只有传了 value 属性才让位），
+           而 value 区是 text-align:right，所以它会正好落在箭头左边。
+           那个数字由 onShow 里那次 refreshUnreadBadge 喂进来，
+           和 tabBar 角标同源同值。
+
+           【只挂在「我的消息」上】
+             tabBar 那个红点的含义是「有人发消息 / 有订单结果了」——
+             只有消息页装着这两样东西。其余几项（我发布的 / 卖出的 /
+             买到的 / 收藏）现在压根没有「未读」这个概念，
+             给它们凭空挂个数字是假的。
+           将来真要做「新订单」之类的角标，得先有服务端的未读状态，
+           不能在这儿凭感觉编一个数。 -->
+      <view
+        wx:if="{{item.title === '我的消息' && unreadTotal > 0}}"
+        class="menu-badge"
+      >{{unreadText}}</view>
+    </van-cell>
+  </van-cell-group>
+</view>
+
+<!-- 工具箱 -->
+<view class="menu-section">
+  <view class="section-title">工具箱</view>
+  <van-cell-group>
+    <van-cell wx:for="{{toolList}}" wx:key="id" title="{{item.title}}" is-link data-title="{{item.title}}" bind:click="onMenuTap">
+      <van-icon slot="icon" name="{{item.icon}}" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+    </van-cell>
+  </van-cell-group>
+</view>
+
+<!-- 设置按钮 -->
+<view class="setting-section">
+  <van-cell title="设置" is-link bind:click="onSettingTap">
+    <van-icon slot="icon" name="setting-o" size="40rpx" color="#FF9500" custom-style="margin-right: 20rpx;" />
+  </van-cell>
+</view>

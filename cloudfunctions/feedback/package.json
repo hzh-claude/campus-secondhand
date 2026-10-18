@@ -1,0 +1,9 @@
+{
+  "name": "feedback",
+  "version": "1.0.0",
+  "description": "意见反馈云函数：提交（含截图内容安全检测）/ 我的反馈列表",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

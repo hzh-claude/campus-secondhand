@@ -1,0 +1,172 @@
+/* pages/search/search.wxss */
+page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 搜索框吸顶。翻到第几页都够得着，
+   不用为了改个关键词一路滚回顶部 */
+.search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* 还没搜过的引导态 */
+.guide {
+  padding-top: 160rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guide-text {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  color: #bbb;
+}
+
+.loading-tip {
+  padding: 60rpx 0;
+  text-align: center;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 结果条数。让用户立刻知道「搜到了东西」还是「一件都没有」，
+   不用靠数卡片 */
+.result-count {
+  padding: 20rpx 10rpx 0;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 商品列表容器 */
+.goods-container {
+  padding: 20rpx;
+}
+
+/* .goods-list 是「两列布局的容器」，属于页面，组件不管这个。
+   卡片自身的样式（含 .hl 关键词高亮）已经全部搬进
+   components/goods-card/index.wxss —— 这里不要再留副本：
+   页面留一份同名的会盖住组件里的，改组件样式改半天没反应就是这个原因。
+
+   原先这里那份复制完成了它的使命，正是它证明了「三份逐字相同」这件事。 */
+.goods-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.list-end {
+  padding: 20rpx 0 40rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #bbb;
+}
+
+/* ============ 搜索历史面板 ============ */
+
+/* 容器高度 0、不占文档流 —— 面板是绝对定位「浮」在结果上的，
+   结果本身还在原位，只是被遮罩压暗。
+   用文档流把结果挤下去的话，面板一开一合页面高度就跳，滚动位置跟着乱。
+
+   z-index 90 刻意【低于】.search-bar 的 100：
+   搜索框必须一直露在最上面、一直点得到，
+   否则面板弹出来就把搜索框盖住了 —— 改不了词，也关不掉它。 */
+.history-layer {
+  position: relative;
+  height: 0;
+  z-index: 90;
+}
+
+/* 面板 top: 0 —— 贴着这一层的上沿，也就是搜索框的下沿。
+   用 top: 0 而不是写死一个 rpx：搜索框高度是组件控制的，
+   这里抄一个数字进去，将来组件改版就错位了。 */
+.history-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 2;
+  padding: 20rpx 30rpx 30rpx;
+  background-color: #fff;
+  /* 下沿圆角 + 一点阴影，让「它是一层浮上来的东西」看得出来；
+     不加的话白色面板和下面白色的商品卡片糊成一片，分不出边界 */
+  border-radius: 0 0 24rpx 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 遮罩铺满整屏，点一下收起面板。
+   它盖住了整屏包括搜索框那一块，但搜索框 z-index 更高（100 > 90），
+   所以只是「看起来盖住」，实际点上去还是搜索框。 */
+.history-mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.history-title {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 「清空」刻意做得小、灰、不显眼。
+   它旁边那些标签才是用户主要想点的，一个抢眼的清空按钮只会招来误触 ——
+   而清空是不可逆的。 */
+.history-clear {
+  font-size: 24rpx;
+  color: #999;
+  padding: 8rpx 12rpx;
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.history-tag {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  margin: 0 16rpx 16rpx 0;
+  padding: 10rpx 16rpx;
+  background-color: #fff;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #333;
+}
+
+/* 长关键词必须能截断：不加这条，一个 30 字的词会把整行撑破，
+   后面的标签被挤到下一行，看着像布局坏了。
+
+   ⚠️ 截断加在 .history-tag-text 这个【真正的文字节点】上，
+      加在 .history-tag 上没有用 —— flex 子项得自己声明溢出规则。 */
+.history-tag-text {
+  max-width: 400rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 删除的 ×。
+   line-height: 1 是为了让它不把标签撑高；上下靠 padding 把可点区域
+   撑到大约 40rpx，否则手指点不中，用户会以为删除功能没做。 */
+.history-tag-x {
+  margin-left: 10rpx;
+  padding: 6rpx;
+  font-size: 28rpx;
+  line-height: 1;
+  color: #bbb;
+}

@@ -1,0 +1,81 @@
+/* pages/register/register.wxss */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.hero {
+  padding: 48rpx 40rpx 40rpx;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.hero-title {
+  font-size: 44rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.hero-desc {
+  font-size: 27rpx;
+  color: #888;
+  line-height: 1.7;
+}
+
+.section {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx 0 24rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  padding: 0 32rpx 20rpx;
+}
+
+/* 字段下方的说明文字。和 .section 的左右留白对齐（32rpx），
+   不然说明会贴着屏幕边，看起来像另一个模块的东西 */
+.field-tip {
+  font-size: 24rpx;
+  color: #aaa;
+  line-height: 1.6;
+  padding: 16rpx 32rpx 0;
+}
+
+.loc-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 32rpx;
+}
+
+.loc-text {
+  flex: 1;
+  font-size: 27rpx;
+  color: #999;
+  margin-right: 20rpx;
+  line-height: 1.5;
+}
+
+/* 三种状态三种颜色。
+   成功用绿色、失败用红色，是为了让用户在截图和日常使用里
+   都能【一眼】看出「到底成没成」—— 定位失败最怕的就是
+   状态不明，用户以为成功了，提交时才被打回来 */
+.loc-idle {
+  color: #999;
+}
+
+.loc-ok {
+  color: #07c160;
+}
+
+.loc-fail {
+  color: #ee0a24;
+}
+
+.submit-section {
+  padding: 40rpx 32rpx 60rpx;
+}

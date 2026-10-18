@@ -1,0 +1,96 @@
+/* pages/about/about.wxss */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0 60rpx;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+/* 尺寸按 logo 本身的宽高比来（2026-10-14 换图后为 736×817，约 0.901），
+   不用正方形 —— 换图时【必须跟着改这两个数】，理由见下。
+
+   原来是 160×160 + mode="aspectFill"，那套组合对竖版图是错的：
+   aspectFill 会等比放大到【填满】方框，多出来的部分直接裁掉 ——
+   竖版图塞进正方形，上下各裁一刀，箭头尖和底部的「物校角」都会缺一块。
+   所以是 aspectFit（完整显示，多余部分留白）+ 贴合的竖向比例。
+
+   180 是宽度，高度 = 180 ÷ 0.901 ≈ 200。
+   这两个数是一对，改宽度不改高度会让 aspectFit 在框里多留白，
+   看着就是「图变小了、周围一圈空」。
+   换 logo 时先量出新图的宽高比，再回来重算这一行。 */
+.logo {
+  width: 180rpx;
+  height: 200rpx;
+  border-radius: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.app-name {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.version {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.intro-section,
+.feature-section {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.intro-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.feature-info {
+  margin-left: 24rpx;
+}
+
+.feature-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.feature-desc {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* .footer / .copyright / .slogan 三个样式随底部那块署名一起删掉了。
+   留着不会报错，但下次改这个页面的人会先花时间找「哪里有 footer」，
+   找完发现根本没有 —— 死代码的成本在这里，不在体积。 */

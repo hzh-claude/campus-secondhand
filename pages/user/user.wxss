@@ -1,0 +1,162 @@
+/* pages/user/user.wxss */
+page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
+}
+
+/* 用户信息卡片 */
+.user-card {
+  background: linear-gradient(135deg, #FF9500 0%, #FFB347 100%);
+  padding: 40rpx 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.8);
+  margin-right: 30rpx;
+}
+
+.info-content {
+  color: #fff;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+}
+
+.sub-info {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-top: 8rpx;
+}
+
+.sub-info text {
+  margin-left: 8rpx;
+}
+
+.edit-btn {
+  width: 60rpx;
+  height: 60rpx;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 统计数据卡片 */
+.statistics-card {
+  background-color: #fff;
+  margin: -30rpx 20rpx 20rpx;
+  border-radius: 16rpx;
+  padding: 30rpx 0;
+  display: flex;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+  border-right: 1rpx solid #eee;
+}
+
+.stat-item:last-child {
+  border-right: none;
+}
+
+.stat-value {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FF9500;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 菜单区域 */
+.menu-section {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  padding-top: 30rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333;
+  padding: 0 30rpx 20rpx;
+}
+
+/* 设置区域 */
+.setting-section {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+/* ============================================================
+   未核验提示条
+   ============================================================
+   挂在橙色用户卡片正下方。底色用浅橙而不是纯白：它是「待办」，
+   不是又一条菜单 —— 白色的菜单项下面已经有五条了，再放一条白的
+   会被当成长得一样的东西划过去。 */
+.verify-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20rpx 20rpx 0;
+  padding: 28rpx 30rpx;
+  background-color: #FFF7EC;
+  border: 2rpx solid #FFE0B2;
+  border-radius: 16rpx;
+}
+
+.verify-banner-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #E67E00;
+}
+
+.verify-banner-desc {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #B37C33;
+}
+
+/* 「我的消息」那一行右边的未读条数。
+   和 pages/message/message.wxss 的 .badge 是同一套红底白字，
+   区别只在那一个是绝对定位挂在会话头像角上，这个是排在箭头左边。
+   改颜色/圆角的时候两处一起看，别让同一个红点长出两种样子。 */
+.menu-badge {
+  /* 必须是 inline-block：view 默认是 block，会撑满整个 value 区，
+     变成一个横贯整行的红条，数字孤零零居中。 */
+  display: inline-block;
+  /* 和箭头对齐。value 区是 vertical-align: middle 的上下文 */
+  vertical-align: middle;
+  min-width: 36rpx;
+  height: 36rpx;
+  padding: 0 12rpx;
+  box-sizing: border-box;
+  border-radius: 18rpx;
+  background: #ee0a24;
+  color: #fff;
+  font-size: 22rpx;
+  line-height: 36rpx;
+  text-align: center;
+}

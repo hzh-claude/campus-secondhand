@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "goods-card": "/components/goods-card/index",
+    "van-icon": "@vant/weapp/icon/index"
+  },
+  "navigationBarTitleText": "卖家主页",
+  "navigationBarBackgroundColor": "#FF9500",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

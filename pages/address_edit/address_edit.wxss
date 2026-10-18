@@ -1,0 +1,29 @@
+/* pages/address_edit/address_edit.wxss */
+page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.form-section {
+  margin-bottom: 20rpx;
+}
+
+.default-section {
+  margin-bottom: 20rpx;
+}
+
+.save-section {
+  padding: 40rpx 30rpx;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  background-color: #FF9500;
+  border-radius: 44rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+}

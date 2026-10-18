@@ -1,0 +1,50 @@
+<!--pages/type_list/type_list.wxml-->
+<!-- 筛选栏：用小程序原生 picker，不依赖第三方组件 -->
+<view class="filter-bar">
+  <picker
+    class="filter-item"
+    range="{{sortOptions}}"
+    range-key="text"
+    value="{{sortIndex}}"
+    bindchange="onSortChange"
+  >
+    <view class="filter-value">{{sortLabel}}</view>
+    <van-icon name="arrow-down" size="20rpx" color="#999" />
+  </picker>
+
+  <picker
+    class="filter-item"
+    range="{{campusOptions}}"
+    range-key="text"
+    value="{{campusIndex}}"
+    bindchange="onCampusChange"
+  >
+    <view class="filter-value">{{campusLabel}}</view>
+    <van-icon name="arrow-down" size="20rpx" color="#999" />
+  </picker>
+</view>
+
+<!-- 商品列表 -->
+<view class="goods-container" wx:if="{{goodsList.length > 0}}">
+  <view class="goods-list">
+    <!-- 卡片内部结构见 components/goods-card，这里只负责传数据。
+         商品 ID 由组件的 cardtap 事件回传（页面里读 e.detail.id），
+         不再靠 data-id 传 —— 原因见组件 index.js 顶部说明 -->
+    <goods-card
+      wx:for="{{goodsList}}"
+      wx:key="id"
+      goods-id="{{item.id}}"
+      image="{{item.image}}"
+      title="{{item.title}}"
+      price="{{item.price}}"
+      views="{{item.views}}"
+      campus="{{item.campus}}"
+      avatar="{{item.publisher.avatar}}"
+      nickname="{{item.publisher.nickname}}"
+      bind:cardtap="onGoodsTap"
+    />
+  </view>
+</view>
+
+<!-- 空状态 -->
+<van-empty wx:else description="暂无商品" />

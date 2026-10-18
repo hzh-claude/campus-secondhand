@@ -1,0 +1,62 @@
+<!-- 表单区域 -->
+<!-- bind:keyboardheightchange 挂在每个可编辑字段上，只为量出键盘高度，
+     见 address_edit.js 的 onKeyboardHeightChange 和页面末尾那块占位 -->
+<view class="form-section">
+  <van-cell-group>
+    <van-field
+      label="联系人"
+      value="{{formData.name}}"
+      placeholder="请输入联系人姓名"
+      bind:change="onNameChange"
+      bind:keyboardheightchange="onKeyboardHeightChange"
+    />
+    <van-field
+      label="手机号"
+      value="{{formData.phone}}"
+      placeholder="请输入手机号"
+      type="number"
+      maxlength="11"
+      bind:change="onPhoneChange"
+      bind:keyboardheightchange="onKeyboardHeightChange"
+    />
+    <van-cell title="所在宿舍" value="{{formData.campus || '请选择'}}" is-link bind:click="onSelectCampus" />
+    <van-field
+      label="详细地址"
+      value="{{formData.detail}}"
+      placeholder="如：第一饭堂门口、图书馆正门"
+      type="textarea"
+      autosize
+      bind:change="onDetailChange"
+      bind:keyboardheightchange="onKeyboardHeightChange"
+    />
+  </van-cell-group>
+</view>
+
+<!-- 设为默认 -->
+<view class="default-section">
+  <van-cell title="设为默认地址" center>
+    <van-switch checked="{{formData.isDefault}}" active-color="#FF9500" bind:change="onDefaultChange" />
+  </van-cell>
+</view>
+
+<!-- 保存按钮 -->
+<view class="save-section">
+  <view class="save-btn" bindtap="onSave">保存</view>
+</view>
+
+<!-- 键盘占位：高度 = 键盘高度，收起时为 0。
+     和 pages/edit/edit.wxml 末尾那块是同一个东西、同一个理由 ——
+     页面没有滚动余量时，van-field 的 adjust-position 就没地方把
+     输入框顶到键盘上方，键盘会盖住下面几行，填的时候看不见自己输的字。
+     必须在页面最后。 -->
+<view style="height: {{kbHeight}}px"></view>
+
+<!-- 宿舍选择弹窗 -->
+<van-popup show="{{showCampusPicker}}" position="bottom" bind:close="onCloseCampusPicker">
+  <van-picker
+    show-toolbar
+    columns="{{campusOptions}}"
+    bind:confirm="onConfirmCampus"
+    bind:cancel="onCloseCampusPicker"
+  />
+</van-popup>

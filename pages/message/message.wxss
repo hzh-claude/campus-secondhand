@@ -1,0 +1,298 @@
+/* pages/message/message.wxss */
+
+page {
+  background: #f5f6f8;
+}
+
+/* ============ 顶部分段 ============
+   两段共用一条时间轴是不行的（长相、点击去处、已读语义都不一样），
+   所以用分段器分开 —— 具体理由见 message.js 顶部。 */
+.segment {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+  /* 跟着页面一起滚（不用 fixed）：这一页内容不长，
+     fixed 反而要额外给下面留 padding，容易漏 */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.segment-item {
+  position: relative;
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  font-size: 30rpx;
+  color: #666;
+}
+
+.segment-item.active {
+  color: #FF9500;
+  font-weight: 600;
+}
+
+/* 选中态下面那条短横线。用 ::after 而不是 border-bottom：
+   border 会占满整格宽度，两段挨在一起时看着像分栏线而不是选中态 */
+.segment-item.active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 64rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: #FF9500;
+}
+
+/* 通知那一格的未读圆点。用点不用数字，理由见 message.wxml */
+.segment-dot {
+  position: absolute;
+  top: 22rpx;
+  right: 50%;
+  margin-right: -78rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ee0a24;
+}
+
+.conv-list {
+  padding: 20rpx 0;
+}
+
+/* ============ 通知列表 ============ */
+.notice-list {
+  padding: 20rpx 0;
+}
+
+.notice-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 28rpx 30rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.notice-item:active {
+  background: #fafafa;
+}
+
+/* 已读的整条压暗一档。
+   光靠左边那个小圆点区分「读没读过」，扫一屏下来并不明显 ——
+   标题颜色一起变浅，才是一眼能看出来的差别。 */
+.notice-item.is-read .notice-title,
+.notice-item.is-read .notice-text {
+  color: #aaa;
+}
+
+/* 未读圆点。占一个固定宽度的坑，已读时变透明而不是不渲染 ——
+   不渲染的话已读那几行的文字会整体左移一格，
+   上下两行的标题对不齐，看着像排版坏了。 */
+.notice-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #ee0a24;
+  flex-shrink: 0;
+  /* 圆点要对齐标题那一行的中线，所以往下推一点 */
+  margin-top: 16rpx;
+  margin-right: 16rpx;
+}
+
+.notice-dot.hidden {
+  background: transparent;
+}
+
+.notice-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #FFF3E0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+}
+
+.notice-body {
+  flex: 1;
+  /* flex 子项默认 min-width:auto，内容长了不肯缩，会把整行撑破 */
+  min-width: 0;
+}
+
+.notice-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.notice-title {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice-time {
+  font-size: 22rpx;
+  color: #bbb;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.notice-text {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* 删除按钮。热区要比图标大一点 —— 图标只有 32rpx，
+   手指点不准，会误触到整条跳到订单列表去 */
+.notice-remove {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: -14rpx -16rpx 0 6rpx;
+}
+
+.conv-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 28rpx 30rpx;
+  background: #fff;
+  /* 用 border 而不是 margin 分隔：margin 会露出灰底，
+     一大串卡片上下都断开看着很碎 */
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.conv-item:active {
+  background: #fafafa;
+}
+
+/* 头像 + 右上角红点。红点要压在头像上，所以这层必须 relative */
+.avatar-wrap {
+  position: relative;
+  width: 96rpx;
+  height: 96rpx;
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 12rpx;
+  background: #f2f2f2;
+}
+
+/* 原来这里有一条 .avatar-empty（居中，配 van-icon 用的）。
+   未设置头像时改成显示默认头像图片之后，这个 class 在 WXML 里已经不存在了。 */
+
+.badge {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  box-sizing: border-box;
+  border-radius: 16rpx;
+  background: #ee0a24;
+  color: #fff;
+  font-size: 20rpx;
+  line-height: 32rpx;
+  text-align: center;
+}
+
+.conv-body {
+  flex: 1;
+  /* flex 子项默认 min-width:auto，内容长了不肯缩，
+     会把整行撑破。这一行是必须的。 */
+  min-width: 0;
+}
+
+.conv-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.peer-name {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+  /* 名字太长时省略，而不是把时间挤出去 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-time {
+  font-size: 22rpx;
+  color: #bbb;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.conv-preview {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #888;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 商品条：用一小块浅底把它和消息正文分开，
+   一眼能看出「上面那句话」和「聊的哪件东西」是两回事 */
+.conv-goods {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  background: #f7f8fa;
+  border-radius: 8rpx;
+  padding: 8rpx 14rpx;
+  overflow: hidden;
+}
+
+.goods-price {
+  font-size: 24rpx;
+  color: #FF9500;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-right: 10rpx;
+}
+
+.goods-title {
+  font-size: 24rpx;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-block {
+  padding-top: 80rpx;
+}
+
+.empty-btn {
+  margin: 20rpx auto 0;
+  width: 240rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  border-radius: 36rpx;
+  background: #FF9500;
+  color: #fff;
+  font-size: 28rpx;
+}
