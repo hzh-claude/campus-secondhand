@@ -152,8 +152,8 @@ goods  users  address  favorites  orders  notifications  feedback  conversations
 ```js
 // utils/cloud-config.js:23-33
 const BRAND = {
-  APP_NAME: '物校角',
-  SCHOOL_NAME: '湖南科技学院'
+  APP_NAME: '小程序名字',
+  SCHOOL_NAME: '学校名字'
 };
 ```
 
